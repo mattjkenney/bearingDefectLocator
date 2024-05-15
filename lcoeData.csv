@@ -1,0 +1,12 @@
+Geothermal,2,0
+Gas Combined Cycle,1,5
+Solar PV - Utility-Scale,3,8
+Wind - Onshore,4,9
+Solar PV - Rooftop Residential,9,5
+Solar PV - Community & C&I,5,9
+Coal,5,11
+Nuclear,15,2
+Gas Peaking,5,14
+Wind - Offshore,12,8
+Solar PV + Storage - Utility-Scale,8,18
+Wind + Storage - Onshore,8,22
