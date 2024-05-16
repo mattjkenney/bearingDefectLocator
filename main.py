@@ -17,3 +17,10 @@ if sect2CB:
 
 st.divider()
 
+sect3CB = st.checkbox("Introduction - The Solution, The Problem, Another Solution, Another Problem")
+if sect3CB:
+    secs.display_s3()
+
+st.divider()
+
+
