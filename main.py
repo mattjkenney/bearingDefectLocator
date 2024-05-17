@@ -23,4 +23,10 @@ if sect3CB:
 
 st.divider()
 
+sect4CB = st.checkbox("The Naive Bayes Solution")
+if sect4CB:
+    secs.display_s4()
+
+st.divider()
+
 
