@@ -145,7 +145,7 @@ def display_s4():
                  with no feature engineering.
                 ## Naive Bayes Mechanics
                 ''')
-    st.write("The posterior probability equation for a class, c, given the set of predictors X:")
+    st.write("The posterior probability equation for a class, $c$ given the set of predictors $X$:")
     pp = r''' 
     $$ 
     P(c|X) = \frac{P(c) \times \displaystyle\prod_{i=1}^n P(x_i|c)}{\displaystyle\prod_{i=1}^n P(x_i)}
