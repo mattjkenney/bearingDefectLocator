@@ -29,4 +29,9 @@ if sect4CB:
 
 st.divider()
 
+sect5CB = st.checkbox("Algorithm Design")
+if sect5CB:
+    secs.display_s5()
+
+st.divider()
 

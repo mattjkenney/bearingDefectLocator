@@ -171,6 +171,9 @@ def display_s4():
              c_j = argmax(P(c_1|X), P(c_2|X), \ldots, P(c_n|X))
              $$
              ''')
-
+    
+def display_s5():
+    st.markdown("## Algorith Design")
+    
     
     
