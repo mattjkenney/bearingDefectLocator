@@ -174,6 +174,29 @@ def display_s4():
     
 def display_s5():
     st.markdown("## Algorith Design")
-    
-    
+    if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False):
+        st.write("Bearing Vibration Features are used for data reduction per vibration dataset. \
+                 A subsection of the dataset is aggregated in periods and statistical characteristics are calculated \
+                 for each period.")
+        st.markdown('''
+                 Inputs
+                 1. $F_s$ = Vibration set files, such that each file contains a dataset of vibration velocities at a \
+                 shaft rotational speed.
+                 2. $nPeriods$ = Number of Periods
+
+                 Steps
+                 1. Initialize array''' + r" $V = \begin{bmatrix}\end{bmatrix}$" + '''
+                 2. For each file in $F_s$:  
+                    1. Extract vibration velocity $y$, speed $x$, and the class label
+                    2. If acceleration is preferred, convert $x$ to acceleration
+                    3. Sort by $x$
+                    4. Aggregate equal quantities of data points by calculating a feature \
+                    across each period for $nPeriods$
+                    5. Build feature array \
+                    ''' + r"$A = \begin{bmatrix}v_1&v_2&\ldots&v_P\end{bmatrix}|v_p$" + '''\
+                    is the feature value in period $p$ in $P$ number of periods.
+                    6. Append $A$ to $V$  
+                 3. Return $V$
+                 ''', unsafe_allow_html=True)
+
     
