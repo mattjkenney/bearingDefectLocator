@@ -4,6 +4,11 @@ import os
 import plotly.express as px
 import plotly.figure_factory as ff
 import numpy as np
+import getdatafile as gdata
+from original_files.classBearingFeatures2 import BearingFeatures as BF
+from original_files.classBayesModel3 import BearingConditionPredictor as BCP
+import readxlsxfiles as rxl
+import featureCalcs as FC
 
 def display_s1():
     st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
@@ -171,13 +176,54 @@ def display_s4():
              c_j = argmax(P(c_1|X), P(c_2|X), \ldots, P(c_n|X))
              $$
              ''')
-    
 def display_s5():
+    st.markdown('### Test Rig')
+    st.image(os.path.join('images', 'testRig.jpg'), caption='Test Rig Set-Up [10]')
+    st.write('''
+             - Encoder model: EPC model 775
+             - Counts per Revolution (CPR) = 1024
+             - Accelerometer Model: ICP accelerometer, Model 623C01
+             - Each sample was measured at 200,000 Hz for 10 seconds
+             - Faults were simulated with a SpectraQuest machinery fault simulator (MFS-PK5M)
+             - 5 health conditions sampled: 
+                - healthy
+                - inner race fault
+                - outer race fault
+                - ball fault
+                - combination fault
+             - 4 varying speed conditions were applied: 
+                - increasing speed
+                - decreasing speed
+                - increasing then descreasing speed
+                - decreasing then increasing speed
+             - 3 samples were taken for each health and speed condition combination
+             ''')
+def display_s6():
     st.markdown("## Algorith Design")
-    if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False):
+    if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False, key='a'):
         st.write("Bearing Vibration Features are used for data reduction per vibration dataset. \
                  A subsection of the dataset is aggregated in periods and statistical characteristics are calculated \
                  for each period.")
+        # graph
+        cap = r''' Encoder Pulses were converted to Velocity with
+            $$
+            \frac{4E \times 10^5}{CPR}
+            $$
+            where, $E$ is encoder pulses and $CPR$ is encoder counts per revolution
+            '''
+        st.markdown('## Raw data...')
+        st.image(os.path.join('images', '2M_sample.png'))
+        st.markdown(cap)
+        st.markdown('## Data Reduction with features aggregrated in periods...')
+        nPeriods_value = st.slider("Number of Periods", min_value=2, max_value=100, value=100)
+        feature = st.radio("Feature", options= ['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin', 'Mean'])
+        domain = st.radio("Domain", options=["Velocity", "Acceleration"])
+        st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
+        ndf = st.session_state.get('2M_sample_df')[['shaft speed', 'vibration velocity']]
+        df2 = gdata.get_dataframe_subset_for_sample(ndf, nPeriods_value, feature, domain)
+        fig2 = px.line(df2, x= 'period', y= feature.lower() + ' vibration velocity')
+        st.plotly_chart(fig2)
+        st.markdown('## Pseudocode 1')
         st.markdown('''
                  Inputs
                  1. $F_s$ = Vibration set files, such that each file contains a dataset of vibration velocities at a \
@@ -198,5 +244,120 @@ def display_s5():
                     6. Append $A$ to $V$  
                  3. Return $V$
                  ''', unsafe_allow_html=True)
+    if st.checkbox("### Pseudocode 2 - Training", value=False, key='b'):
+        st.markdown('## The range is divided in bins. Frequencies of each class is caluclated for each bin.')
+        st.markdown('## Raising the bin quantity allows better distinction between classes.')
+        df: pd.DataFrame = st.session_state.get('dfs20')
+        fig = px.scatter(df, x= 'period', y= df.columns, labels= {'value': 'vibration velocity kurtosis'})
+        high = df.max().max()
+        low = df.min().min()
+        nbins = st.number_input("Number of Bins", min_value=2, max_value=100, value=10)
+        inc = (high - low) / nbins
+        for b in range(nbins - 1):
+            nbin_line = low + ((b + 1) * inc)
+            fig.add_hline(y=nbin_line, line_color='grey')
+        for p in df['period']:
+            fig.add_vline(x= p - 0.5, line_color='grey')
+            fig.add_vline(x= p + 0.5, line_color='grey')
+        fig.update_xaxes(showgrid=False)
+        fig.update_yaxes(showgrid=False)
+        st.plotly_chart(fig)
+        st.write('Graph note: Graph shows the mean kurtosis by the sorted acceleration in 20 Periods for each class.')
+        st.divider()
+        st.markdown('#### Where $n_c=$ number of instances in class $c$, and')
+        st.markdown('#### $N=$ total number of instances...')
+        st.markdown('### Prior Probability=')
+        st.markdown(r'''
+                    $$
+                    P(c)=\frac{n_c}{N}
+                    $$
+                    ''')
+        st.divider()
+        st.markdown('#### Where $f=$ frequency count, and')
+        st.markdown('#### $b=$ the bin index in period $p$...')
+        st.markdown('### Likelihood Propability=')
+        st.markdown(r'''
+                    $$
+                    P(b_p|c)=\frac{f_{bp},c}{n_c}
+                    $$
+                    ''')
+        st.divider()
+        st.markdown('#### Where $f=$ frequency count, and')
+        st.markdown('#### $b=$ the bin index in period $p$:')
+        st.markdown('### Evidence Probability= ')
+        st.markdown(r'''
+                    $$
+                    P(b_p)=\frac{f_{bp}}{N}
+                    $$
+                    ''')
+        st.markdown('## Pseudocode 2')
+        st.markdown('''
+                 Inputs
+                 1. $V_{training}$ = Pseudocode 1 where $F_s=$ the files array for the training set 
+                 2. $nBins$ = Number of Bins per Period
 
-    
+                 Steps
+                 1. With $V_{training}$:
+                    1. Count $N$ for all instances
+                    2. Count $n_c$ for each unique class label
+                    3. Create a dictionary $P_c | c_{label} = $ prior probability for each class $c$ 
+                    4. Calculate $nBins$ edges for each period
+                    5. Create array $B = [b_{xp} \ldots b_{nBins,nPeriods}] | b_{xp} =$ bin index $x$ in period $p$
+                    6. With $B$ count $f_{bp}$ for all unique class labels
+                    7. Create dictionary $P_{bp|c} | c_{label} = $ likelihood probabilty for all bins and classes
+                    8. Create dictionary $P_{bp} | b_{index x, period p} =$ evidence probability for $b_{index x, period p}$
+                    9. Create dictionary $C | $ class label = array $T_{training}$ containing bin identifiers for all bins occupied by that class
+                 2. Return $P_c, B, P_{bp|c}, P_{bp}, C$
+                 ''', unsafe_allow_html=True)
+    if st.checkbox("### Pseudocode 3: Naïve Bayes Algorithm with Characteristic Bin Utilization", value=False, key='c'):
+        st.markdown("#### A Characteristic Bin for a class is one that holds at least one data point from all instances in the class.")
+        st.markdown("#### Pseudocode 3 filters all predictors in $X$ to in the intersection of Characteristic Bins of the training and test sets.")
+        st.markdown("#### This not only greatly improves accuracy, as I will show in Experiment 3, but also solves the problem of 0 in the denominator\
+                    caused by empty bins in the evidence probabilty equation.")
+        st.markdown('### How Characteristic Bin filtering improves accuracy: ')
+        st.markdown('#### - Suppose a test sample occupies all the same bins for one particular class, except for one bin')
+        st.markdown("#### - Both sharing 19 out of 20 bins is pretty good, in reality it's very likely to be a member of that class")
+        st.markdown("#### - However...") 
+        st.markdown('#### - The liklihood probability would fall to 0%...')
+        st.markdown('#### - Therefore the posterior probability would fall to 0%...')
+        st.markdown('#### - The result would show a 0% chance for that class.')
+        st.divider()
+        st.markdown('## Pseudocode 3')
+        st.markdown('''
+                 Inputs
+                 1. $V_{test}$ = Pseudocode 1 where $F_s=$ the files array for the test set 
+                 2. $P_c, B, P_{bp|c}, P_{bp}, C$ = Pseudocode 2
+
+                 Steps
+                 1. With $V_{test}$:
+                    1. With $B$, create array $T_{test}$ containing the bin identifiers of all bins occupied by $V_{test}$ 
+                    2. Initialize array $F =$ [ ]
+                    3. For each unique class label in $V_{training}$:
+                        1. Calculate $P(c | X) | X = T_{training | class label=current label} \cap T_{test}$
+                        2. Append $P(c | X)$ to $F$
+                2. Class Prediction = $argmax(F)$
+                3. Return Class Prediction
+                 ''', unsafe_allow_html=True)
+def display_s7():
+    st.markdown("## Experiment 1 - Feature-Domain Selection")
+    feature = st.radio("Feature", options=['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin'])
+    st.markdown(feature + ': ' + FC.get_equation(feature.lower())[0])
+    st.markdown(FC.get_equation(feature.lower())[1])
+    domain = st.radio("Domain", options=["Velocity", "Acceleration"])
+    st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
+    df = rxl.get_feature_domain_20p(feature + domain)
+    fig = px.line(df, x= 'period', y=df.columns)
+    st.plotly_chart(fig)
+    st.write("Graph shows the mean feature calculation by the sorted domain in 20 Periods for each class.")
+    st.markdown("### The objective of Experiment 1 is to find the feature-domain combination that results is the highest predition accuracy.")
+    st.markdown('### Each Feature-Domain combination was trained and tested with 50% sampling.')
+    st.markdown('#### For each test these conditions were held constant:')
+    st.markdown('####   nPeriods = 20')
+    st.markdown('####   nBins    = 10')
+    st.markdown('### Each Feature-Domain set was sampled and tested in 50 occasions, with new samples pulled on each occasion.')
+    st.markdown('#### Table Results...')
+    df = rxl.get_exp1()
+    st.dataframe(df.style.highlight_max(['Mean']).highlight_min(['Std. Dev.']), use_container_width=True)
+    df['Feature-Domain'] = [df.at[i,'Feature'] + '-' + df.at[i, 'Domain'] for i in range(df.shape[0])]
+    fig = px.box(df, y='Mean', x='fd', labels={'Mean': 'Mean Accuracy'})
+    st.plotly_chart(fig)

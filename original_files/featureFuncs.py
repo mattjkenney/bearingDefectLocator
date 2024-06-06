@@ -73,6 +73,9 @@ class Features():
         den = np.power(N * sum(np.sqrt(abs(dar))), 2)
 
         return num / den
+    
+    def mean(self):
+        return np.mean(self.dataset)
 
     def dataframe(self):
 

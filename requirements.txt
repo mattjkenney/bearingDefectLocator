@@ -4,3 +4,9 @@ plotly
 numpy
 scipy
 boto3
+sqlalchemy
+psycopg2
+pyyaml
+tqdm
+ipywidgets
+openpyxl

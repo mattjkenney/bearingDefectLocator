@@ -2,7 +2,7 @@ from scipy import io
 import numpy as np
 import pandas as pd
 import scipy.stats as st
-from featureFuncs import Features as F
+from original_files.featureFuncs import Features as F
 
 class BearingFeatures():
 
@@ -39,9 +39,10 @@ class BearingFeatures():
 
         return ar
 
-    def featuresArray(self, x_feat= 'Velocity', timespan_sec= 10): 
+    def featuresArray(self, ar= [], x_feat= 'Velocity', timespan_sec= 10): 
 
-        ar = self.get_xy()
+        if len(ar) == 0:
+            ar = self.get_xy()
         
         if x_feat == 'Acceleration':
             ar2 = ar[:,0]
@@ -65,7 +66,8 @@ class BearingFeatures():
             'Crest': lambda tF: tF.crest(),
             'Shape': lambda tF: tF.shape(),
             'Impulse': lambda tF: tF.impulse(),
-            'Margin': lambda tF: tF.margin()}
+            'Margin': lambda tF: tF.margin(),
+            'Mean': lambda tF: tF.mean()}
         
         nTotal = df.shape[0]
         chunk = int(nTotal / self.nPeriods)

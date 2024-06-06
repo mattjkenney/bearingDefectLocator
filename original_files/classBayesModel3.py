@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import classBearingFeatures2 as bF
+import original_files.classBearingFeatures2 as bF
 
 
 class BearingConditionPredictor():

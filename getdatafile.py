@@ -2,26 +2,78 @@ import boto3
 import os
 import pickle as pk
 from scipy.io import loadmat
-import original_files.classBearingFeatures2 as BF
+from original_files.classBearingFeatures2 import BearingFeatures as BF
+import numpy as np
+import sqlalchemy as sqla
+import yaml
+from sqlalchemy import Engine
+import pandas as pd
+from original_files.classBayesModel3 import BearingConditionPredictor as BCP
 
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'../.aws/bearingDefectLocator/credentials'
 os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
+os.environ['DB_CREDENTIALS_FILE'] = r'/home/mattjkenney/projects/.aws/bearingDefectLocator/db.yaml'
 
-def get_data_from_label(label):
+def get_engine():
+
+    with open(os.environ['DB_CREDENTIALS_FILE'], 'r') as filehandle:
+        file = yaml.safe_load(filehandle)
+
+    engURL = sqla.URL.create(
+        drivername= "postgresql+psycopg2",
+        username= file.get('master_username'),
+        password= file.get('master_password'),
+        port= 5432,
+        host= file.get('endpoint'),
+        database="bearingvibrations"     
+    )
+    
+    engine = sqla.create_engine(engURL)
+    
+    return engine
+
+def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, feat, domain):
+
+    arr = master_dataframe.to_numpy()
+    bf = BF(xy_array= arr, category='healthy', nPeriods= periods, feature= feat)
+    farr = bf.featuresArray(ar= bf.xy_array, x_feat= domain)
+    farr = farr.transpose()
+    df = pd.DataFrame(farr, columns= [feat.lower() + ' vibration velocity'])
+    df['period'] = [i + 1 for i in range(df.shape[0])]
+
+    return df
+
+def get_dataframe_from_label(label, qty=12):
 
     with open('vibs.pk', 'rb') as filehandle:
         keyDict = pk.load(filehandle)
     keys = keyDict.get(label)
 
+    labelDict= {"H": 'healthy', "I": 'inner race', "O": 'outer race', "B": 'ball', "C": "combination"}
+
+    assert len(keys) >= qty # qty value cannot exceed the number of total objects
+
     client = boto3.client('s3')
-    arrs = []
-    for objkey in keys:
-        object = client.get_object(Bucket= 'bearingvibrations', key= objkey)
-        bf = BF(file_location= object)
-        ar = bf.get_xy()
-        arrs.append(ar)
+    dfs = []
+    temp_file = 'temp_file.mat'
+    for i in range(qty):
+        objkey = keys[i]
+        with open(temp_file, 'wb') as data:
+            client.download_fileobj('bearingvibrations', objkey, data)
+        data.close()
+        matfile = loadmat(temp_file)
+        dfn = pd.DataFrame()
+        dfn['vibration velocity'] = tuple(np.reshape(matfile.get('Channel_1'), (2000000,)))
+        dfn['shaft speed'] = tuple(np.reshape(matfile.get('Channel_2'), (2000000,)))
+        dfn['label'] = tuple([labelDict.get(objkey[-9]) for i in range(len(dfn['vibration velocity']))])
+        dfn['instance'] = [objkey[-9:-4] for _ in range(len(dfn['vibration velocity']))]
+        columnsOrder=['instance', 'label', 'shaft speed', 'vibration velocity']
+        dfn = dfn.reindex(columns= columnsOrder)
+        dfs.append(dfn)
+    dfm = pd.concat(dfs, ignore_index=True)
+    os.remove(temp_file)
     
-    return arrs
+    return dfm
 
 def get_keys_file(bucket_name= 'bearingvibrations'):
 
@@ -39,5 +91,4 @@ def get_keys_file(bucket_name= 'bearingvibrations'):
     return
 
 if __name__ == "__main__":
-    arrs = get_data_from_label(label='healthy')
-    print(len(arrs))
+    get_engine()
