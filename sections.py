@@ -405,5 +405,22 @@ def display_s8():
         st.divider()
         st.write("Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
         st.write(dfKA_table.to_html(), unsafe_allow_html=True)
-    
+    st.write('### Conclusions:')
+    st.write('#### 1.&emsp;With Crest-Acceleration -', unsafe_allow_html=-True)
+    st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying any parameter.', unsafe_allow_html=-True)
+    st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 83% with,', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;30 bins per periods and 80 periods', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;40 bins per periods and 90 periods', unsafe_allow_html=True)
+    st.write('#### 2.&emsp;With Kurtosis-Acceleration -', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying the number of periods.', unsafe_allow_html=-True)
+    st.write('####   &emsp;&emsp;&emsp;Noticeable improvement while varying the number of bins.', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 97% with,', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;90 bins per periods and 80 periods', unsafe_allow_html=True)
+    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;100 bins per periods and 100 periods', unsafe_allow_html=True)
+
+def display_s9():
+
+    st.markdown('## Experiment 3 - Optimized Algorithm Comparisons')
+
+    return
     

@@ -66,3 +66,9 @@ if sect8CB:
     secs.display_s8()
 
 st.divider()
+
+sect9CB = st.checkbox("Experiment 3 - Optimized Algorithm Comparisons")
+if sect9CB:
+    secs.display_s9()
+
+st.divider()
