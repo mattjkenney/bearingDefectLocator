@@ -1,6 +1,28 @@
 import pandas as pd
 import openpyxl as xl
 
+def get_exp2_tables_df(FD):
+    
+    df: pd.DataFrame = pd.read_excel("results.xlsx", sheet_name=FD, header=0)
+    df = df.set_index('Number of Periods')
+    df.columns = pd.MultiIndex.from_product([['Number of Bins'], df.columns])
+    df = df.round(0)
+    df = df.astype(int)
+    
+    return df
+
+def get_exp2_df():
+
+    df = pd.read_excel("results.xlsx", sheet_name="Sheet1", header=0, usecols=[1,2,3,4])
+
+    return df
+
+def get_boxplot_df():
+
+    df = pd.read_excel("exp1_boxplot.xlsx", sheet_name="vVelTab", header=0)
+    
+    return df
+
 def get_feature_domain_20p(feature_domain):
 
     df: pd.DataFrame = pd.read_excel('featuresLineCharts.xlsx', sheet_name=feature_domain, header=0)
@@ -40,9 +62,13 @@ def get_exp1():
     
     return df
 
-if __name__ == "__main__":
-    df = get_exp1()
+def test():
+
+    df = get_exp2_tables_df('CA')
     print(df)
+
+if __name__ == "__main__":
+    test()
 
 
 

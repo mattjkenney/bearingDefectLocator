@@ -61,3 +61,8 @@ if sect7CB:
 
 st.divider()
 
+sect8CB = st.checkbox("Experiment 2 - Period and Bin Quantity Optimization")
+if sect8CB:
+    secs.display_s8()
+
+st.divider()

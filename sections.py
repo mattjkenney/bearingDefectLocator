@@ -3,12 +3,14 @@ import pandas as pd
 import os
 import plotly.express as px
 import plotly.figure_factory as ff
+import plotly.graph_objects as go
 import numpy as np
 import getdatafile as gdata
 from original_files.classBearingFeatures2 import BearingFeatures as BF
 from original_files.classBayesModel3 import BearingConditionPredictor as BCP
 import readxlsxfiles as rxl
 import featureCalcs as FC
+import getgraphs as gg
 
 def display_s1():
     st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
@@ -349,15 +351,59 @@ def display_s7():
     fig = px.line(df, x= 'period', y=df.columns)
     st.plotly_chart(fig)
     st.write("Graph shows the mean feature calculation by the sorted domain in 20 Periods for each class.")
-    st.markdown("### The objective of Experiment 1 is to find the feature-domain combination that results is the highest predition accuracy.")
+    st.markdown("### Goal: Find the feature-domain combination that results is the highest predition accuracy.")
     st.markdown('### Each Feature-Domain combination was trained and tested with 50% sampling.')
     st.markdown('#### For each test these conditions were held constant:')
     st.markdown('####   nPeriods = 20')
     st.markdown('####   nBins    = 10')
     st.markdown('### Each Feature-Domain set was sampled and tested in 50 occasions, with new samples pulled on each occasion.')
-    st.markdown('#### Table Results...')
+    st.divider()
+    st.markdown('#### Results...')
     df = rxl.get_exp1()
     st.dataframe(df.style.highlight_max(['Mean']).highlight_min(['Std. Dev.']), use_container_width=True)
-    df['Feature-Domain'] = [df.at[i,'Feature'] + '-' + df.at[i, 'Domain'] for i in range(df.shape[0])]
-    fig = px.box(df, y='Mean', x='fd', labels={'Mean': 'Mean Accuracy'})
+
+    # Graph
+    dfBP = rxl.get_boxplot_df()
+    fig = px.box(dfBP, y=dfBP.columns, labels={'value': 'Accuracy', 'variable': 'Feature-Domain'})
     st.plotly_chart(fig)
+
+def display_s8():
+    st.markdown("## Experiment 2 - Period and Bin Quantity Optimization")
+    st.write('### Goal: Find the minimum number of periods and bins to achieve maximum prediction accuracy.')
+    st.write('### Procedure:')
+    st.write('#### &emsp;Variables:', unsafe_allow_html=True)
+    st.write("#### 1.&emsp;&emsp;Feature-Domain: $T=['Crest-Acceleration', 'Kurtosis-Acceleration']$", unsafe_allow_html=True)
+    st.write('#### 2.&emsp;&emsp;Periods: $P=[10,20,\ldots,100]$', unsafe_allow_html=True)
+    st.write('#### 3.&emsp;&emsp;Bins: $B=[10,20,\ldots,100]$', unsafe_allow_html=True)
+    st.write('#### &emsp;Actions:', unsafe_allow_html=True)
+    st.write('#### 1.&emsp;&emsp;For each Feature-Domain in T:', unsafe_allow_html=True)
+    st.write('#### 2.&emsp;&emsp;&emsp;&emsp;For each Cartesian Product of P and B:', unsafe_allow_html=True)
+    st.write('#### 3.&emsp;&emsp;&emsp;&emsp;&emsp;In 3 instances, with 50% sampling:', unsafe_allow_html=True)
+    st.write('#### 4.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pull a sample.', unsafe_allow_html=True)
+    st.write('#### 5.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Train and test the model.', unsafe_allow_html=True)
+    st.write('#### 6.&emsp;&emsp;&emsp;&emsp;&emsp;Find the Mean Accuracy.', unsafe_allow_html=True)
+    st.divider()
+    st.markdown('#### Results...')
+    # Table
+
+    # Graph
+    dfexp2 = rxl.get_exp2_df()
+    dfCA = dfexp2[dfexp2['FD'] == 0].reset_index(drop=True)
+    dfKA = dfexp2[dfexp2['FD'] == 1].reset_index(drop=True)
+    (figCA, figKA) = gg.get_exp2_graphs([dfCA, dfKA])
+    st.write("### Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
+    st.plotly_chart(figCA)
+    st.divider()
+    st.write("### Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
+    st.plotly_chart(figKA)
+    st.divider()
+    if st.checkbox("Show data tables"):
+        dfCA_table = rxl.get_exp2_tables_df('CA')
+        dfKA_table = rxl.get_exp2_tables_df('KA')
+        st.write("Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
+        st.write(dfCA_table.to_html(), unsafe_allow_html=True)
+        st.divider()
+        st.write("Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
+        st.write(dfKA_table.to_html(), unsafe_allow_html=True)
+    
+    
