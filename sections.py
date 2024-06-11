@@ -421,6 +421,13 @@ def display_s8():
 def display_s9():
 
     st.markdown('## Experiment 3 - Optimized Algorithm Comparisons')
-
+    st.write('### Goal: Compare 3 classifers for prediction accuracy and time.')
+    st.write('#### Algorithms:')
+    st.write('#### &emsp;&emsp;1. Algorithm A: Pseudocode 3 with Kurtosis-Acceleration, 80 bins per period, \
+             and 90 periods', unsafe_allow_html=True)
+    st.write('#### &emsp;&emsp;2. Algorithm B: Algorithm A - except no filtering for characteristic bins, \
+             instead applying a sample weight = 0.01 (prvents division by 0)', unsafe_allow_html=True)
+    st.write('#### &emsp;&emsp;3. Algorithm C: Multinomial Naïve Bayes method from Scikit-Learn [15], \
+             also where sample weights = 0.01', unsafe_allow_html=True)
     return
     
