@@ -12,6 +12,11 @@ import readxlsxfiles as rxl
 import featureCalcs as FC
 import getgraphs as gg
 
+def collapse_button(key):
+    def collapse(key):
+        st.session_state[key] = False
+    st.button("Collapse this section", on_click=collapse, args=[key])
+
 def display_s1():
     st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
     st.markdown("""
@@ -202,7 +207,7 @@ def display_s5():
              ''')
 def display_s6():
     st.markdown("## Algorith Design")
-    if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False, key='a'):
+    if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False, key='p1'):
         st.write("Bearing Vibration Features are used for data reduction per vibration dataset. \
                  A subsection of the dataset is aggregated in periods and statistical characteristics are calculated \
                  for each period.")
@@ -246,7 +251,9 @@ def display_s6():
                     6. Append $A$ to $V$  
                  3. Return $V$
                  ''', unsafe_allow_html=True)
-    if st.checkbox("### Pseudocode 2 - Training", value=False, key='b'):
+        collapse_button('p1')
+
+    if st.checkbox("### Pseudocode 2 - Training", value=False, key='p2'):
         st.markdown('## The range is divided in bins. Frequencies of each class is caluclated for each bin.')
         st.markdown('## Raising the bin quantity allows better distinction between classes.')
         df: pd.DataFrame = st.session_state.get('dfs20')
@@ -311,7 +318,9 @@ def display_s6():
                     9. Create dictionary $C | $ class label = array $T_{training}$ containing bin identifiers for all bins occupied by that class
                  2. Return $P_c, B, P_{bp|c}, P_{bp}, C$
                  ''', unsafe_allow_html=True)
-    if st.checkbox("### Pseudocode 3: Naïve Bayes Algorithm with Characteristic Bin Utilization", value=False, key='c'):
+        collapse_button('p2')
+
+    if st.checkbox("### Pseudocode 3: Naïve Bayes Algorithm with Characteristic Bin Utilization", value=False, key='p3'):
         st.markdown("#### A Characteristic Bin for a class is one that holds at least one data point from all instances in the class.")
         st.markdown("#### Pseudocode 3 filters all predictors in $X$ to in the intersection of Characteristic Bins of the training and test sets.")
         st.markdown("#### This not only greatly improves accuracy, as I will show in Experiment 3, but also solves the problem of 0 in the denominator\
@@ -340,94 +349,105 @@ def display_s6():
                 2. Class Prediction = $argmax(F)$
                 3. Return Class Prediction
                  ''', unsafe_allow_html=True)
+        collapse_button('p3')
+
 def display_s7():
-    st.markdown("## Experiment 1 - Feature-Domain Selection")
-    feature = st.radio("Feature", options=['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin'])
-    st.markdown(feature + ': ' + FC.get_equation(feature.lower())[0])
-    st.markdown(FC.get_equation(feature.lower())[1])
-    domain = st.radio("Domain", options=["Velocity", "Acceleration"])
-    st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
-    df = rxl.get_feature_domain_20p(feature + domain)
-    fig = px.line(df, x= 'period', y=df.columns)
-    st.plotly_chart(fig)
-    st.write("Graph shows the mean feature calculation by the sorted domain in 20 Periods for each class.")
-    st.markdown("### Goal: Find the feature-domain combination that results is the highest predition accuracy.")
-    st.markdown('### Each Feature-Domain combination was trained and tested with 50% sampling.')
-    st.markdown('#### For each test these conditions were held constant:')
-    st.markdown('####   nPeriods = 20')
-    st.markdown('####   nBins    = 10')
-    st.markdown('### Each Feature-Domain set was sampled and tested in 50 occasions, with new samples pulled on each occasion.')
-    st.divider()
-    st.markdown('#### Results...')
-    df = rxl.get_exp1()
-    st.dataframe(df.style.highlight_max(['Mean']).highlight_min(['Std. Dev.']), use_container_width=True)
-
-    # Graph
-    dfBP = rxl.get_boxplot_df()
-    fig = px.box(dfBP, y=dfBP.columns, labels={'value': 'Accuracy', 'variable': 'Feature-Domain'})
-    st.plotly_chart(fig)
-
-def display_s8():
-    st.markdown("## Experiment 2 - Period and Bin Quantity Optimization")
-    st.write('### Goal: Find the minimum number of periods and bins to achieve maximum prediction accuracy.')
-    st.write('### Procedure:')
-    st.write('#### &emsp;Variables:', unsafe_allow_html=True)
-    st.write("#### 1.&emsp;&emsp;Feature-Domain: $T=['Crest-Acceleration', 'Kurtosis-Acceleration']$", unsafe_allow_html=True)
-    st.write('#### 2.&emsp;&emsp;Periods: $P=[10,20,\ldots,100]$', unsafe_allow_html=True)
-    st.write('#### 3.&emsp;&emsp;Bins: $B=[10,20,\ldots,100]$', unsafe_allow_html=True)
-    st.write('#### &emsp;Actions:', unsafe_allow_html=True)
-    st.write('#### 1.&emsp;&emsp;For each Feature-Domain in T:', unsafe_allow_html=True)
-    st.write('#### 2.&emsp;&emsp;&emsp;&emsp;For each Cartesian Product of P and B:', unsafe_allow_html=True)
-    st.write('#### 3.&emsp;&emsp;&emsp;&emsp;&emsp;In 3 instances, with 50% sampling:', unsafe_allow_html=True)
-    st.write('#### 4.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pull a sample.', unsafe_allow_html=True)
-    st.write('#### 5.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Train and test the model.', unsafe_allow_html=True)
-    st.write('#### 6.&emsp;&emsp;&emsp;&emsp;&emsp;Find the Mean Accuracy.', unsafe_allow_html=True)
-    st.divider()
-    st.markdown('#### Results...')
-    # Table
-
-    # Graph
-    dfexp2 = rxl.get_exp2_df()
-    dfCA = dfexp2[dfexp2['FD'] == 0].reset_index(drop=True)
-    dfKA = dfexp2[dfexp2['FD'] == 1].reset_index(drop=True)
-    (figCA, figKA) = gg.get_exp2_graphs([dfCA, dfKA])
-    st.write("### Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
-    st.plotly_chart(figCA)
-    st.divider()
-    st.write("### Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
-    st.plotly_chart(figKA)
-    st.divider()
-    if st.checkbox("Show data tables"):
-        dfCA_table = rxl.get_exp2_tables_df('CA')
-        dfKA_table = rxl.get_exp2_tables_df('KA')
-        st.write("Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
-        st.write(dfCA_table.to_html(), unsafe_allow_html=True)
+    if st.checkbox("Experiment 1 - Feature-Domain Selection", key='exp1'):
+        st.markdown("## Experiment 1 - Feature-Domain Selection")
+        feature = st.radio("Feature", options=['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin'])
+        st.markdown(feature + ': ' + FC.get_equation(feature.lower())[0])
+        st.markdown(FC.get_equation(feature.lower())[1])
+        domain = st.radio("Domain", options=["Velocity", "Acceleration"])
+        st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
+        df = rxl.get_feature_domain_20p(feature + domain)
+        fig = px.line(df, x= 'period', y=df.columns)
+        st.plotly_chart(fig)
+        st.write("Graph shows the mean feature calculation by the sorted domain in 20 Periods for each class.")
+        st.markdown("### Goal: Find the feature-domain combination that results is the highest predition accuracy.")
+        st.markdown('### Each Feature-Domain combination was trained and tested with 50% sampling.')
+        st.markdown('#### For each test these conditions were held constant:')
+        st.markdown('####   nPeriods = 20')
+        st.markdown('####   nBins    = 10')
+        st.markdown('### Each Feature-Domain set was sampled and tested in 50 occasions, with new samples pulled on each occasion.')
         st.divider()
-        st.write("Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
-        st.write(dfKA_table.to_html(), unsafe_allow_html=True)
-    st.write('### Conclusions:')
-    st.write('#### 1.&emsp;With Crest-Acceleration -', unsafe_allow_html=-True)
-    st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying any parameter.', unsafe_allow_html=-True)
-    st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 83% with,', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;30 bins per periods and 80 periods', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;40 bins per periods and 90 periods', unsafe_allow_html=True)
-    st.write('#### 2.&emsp;With Kurtosis-Acceleration -', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying the number of periods.', unsafe_allow_html=-True)
-    st.write('####   &emsp;&emsp;&emsp;Noticeable improvement while varying the number of bins.', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 97% with,', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;90 bins per periods and 80 periods', unsafe_allow_html=True)
-    st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;100 bins per periods and 100 periods', unsafe_allow_html=True)
+        st.markdown('#### Results...')
+        df = rxl.get_exp1()
+        st.dataframe(df.style.highlight_max(['Mean']).highlight_min(['Std. Dev.']), use_container_width=True)
 
-def display_s9():
+        # Graph
+        dfBP = rxl.get_boxplot_df()
+        fig = px.box(dfBP, y=dfBP.columns, labels={'value': 'Accuracy', 'variable': 'Feature-Domain'})
+        st.plotly_chart(fig)
 
-    st.markdown('## Experiment 3 - Optimized Algorithm Comparisons')
-    st.write('### Goal: Compare 3 classifers for prediction accuracy and time.')
-    st.write('#### Algorithms:')
-    st.write('#### &emsp;&emsp;1. Algorithm A: Pseudocode 3 with Kurtosis-Acceleration, 80 bins per period, \
-             and 90 periods', unsafe_allow_html=True)
-    st.write('#### &emsp;&emsp;2. Algorithm B: Algorithm A - except no filtering for characteristic bins, \
-             instead applying a sample weight = 0.01 (prvents division by 0)', unsafe_allow_html=True)
-    st.write('#### &emsp;&emsp;3. Algorithm C: Multinomial Naïve Bayes method from Scikit-Learn [15], \
-             also where sample weights = 0.01', unsafe_allow_html=True)
+        collapse_button('exp1')
+        st.divider()
+
+    if st.checkbox("Experiment 2 - Period and Bin Quantity Optimization", key='exp2'):
+        st.markdown("## Experiment 2 - Period and Bin Quantity Optimization")
+        st.write('### Goal: Find the minimum number of periods and bins to achieve maximum prediction accuracy.')
+        st.write('### Procedure:')
+        st.write('#### &emsp;Variables:', unsafe_allow_html=True)
+        st.write("#### 1.&emsp;&emsp;Feature-Domain: $T=['Crest-Acceleration', 'Kurtosis-Acceleration']$", unsafe_allow_html=True)
+        st.write('#### 2.&emsp;&emsp;Periods: $P=[10,20,\ldots,100]$', unsafe_allow_html=True)
+        st.write('#### 3.&emsp;&emsp;Bins: $B=[10,20,\ldots,100]$', unsafe_allow_html=True)
+        st.write('#### &emsp;Actions:', unsafe_allow_html=True)
+        st.write('#### 1.&emsp;&emsp;For each Feature-Domain in T:', unsafe_allow_html=True)
+        st.write('#### 2.&emsp;&emsp;&emsp;&emsp;For each Cartesian Product of P and B:', unsafe_allow_html=True)
+        st.write('#### 3.&emsp;&emsp;&emsp;&emsp;&emsp;In 3 instances, with 50% sampling:', unsafe_allow_html=True)
+        st.write('#### 4.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Pull a sample.', unsafe_allow_html=True)
+        st.write('#### 5.&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;Train and test the model.', unsafe_allow_html=True)
+        st.write('#### 6.&emsp;&emsp;&emsp;&emsp;&emsp;Find the Mean Accuracy.', unsafe_allow_html=True)
+        st.divider()
+        st.markdown('#### Results...')
+        # Table
+
+        # Graph
+        dfexp2 = rxl.get_exp2_df()
+        dfCA = dfexp2[dfexp2['FD'] == 0].reset_index(drop=True)
+        dfKA = dfexp2[dfexp2['FD'] == 1].reset_index(drop=True)
+        (figCA, figKA) = gg.get_exp2_graphs([dfCA, dfKA])
+        st.write("### Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
+        st.plotly_chart(figCA)
+        st.divider()
+        st.write("### Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
+        st.plotly_chart(figKA)
+        st.divider()
+        if st.checkbox("Show data tables"):
+            dfCA_table = rxl.get_exp2_tables_df('CA')
+            dfKA_table = rxl.get_exp2_tables_df('KA')
+            st.write("Mean Classifier Accuracy with Crest-Acceleration, Varying Period and Bin Quantity, n=3")
+            st.write(dfCA_table.to_html(), unsafe_allow_html=True)
+            st.divider()
+            st.write("Mean Classifier Accuracy with Kurtosis-Acceleration, Varying Period and Bin Quantity, n=3")
+            st.write(dfKA_table.to_html(), unsafe_allow_html=True)
+        st.write('### Conclusions:')
+        st.write('#### 1.&emsp;With Crest-Acceleration -', unsafe_allow_html=-True)
+        st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying any parameter.', unsafe_allow_html=-True)
+        st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 83% with,', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;30 bins per periods and 80 periods', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;40 bins per periods and 90 periods', unsafe_allow_html=True)
+        st.write('#### 2.&emsp;With Kurtosis-Acceleration -', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;No clear improvement while varying the number of periods.', unsafe_allow_html=-True)
+        st.write('####   &emsp;&emsp;&emsp;Noticeable improvement while varying the number of bins.', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;Max Mean Accuracy = 97% with,', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;90 bins per periods and 80 periods', unsafe_allow_html=True)
+        st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;100 bins per periods and 100 periods', unsafe_allow_html=True)
+
+        collapse_button('exp2')
+        st.divider()
+
+    if st.checkbox('Experiment 3 - Optimized Algorithm Comparisons', key='exp3'):
+        st.markdown('## Experiment 3 - Optimized Algorithm Comparisons')
+        st.write('### Goal: Compare 3 classifers for prediction accuracy and time.')
+        st.write('#### Algorithms:')
+        st.write('#### &emsp;&emsp;1. Algorithm A: Pseudocode 3 with Kurtosis-Acceleration, 80 bins per period, \
+                and 90 periods', unsafe_allow_html=True)
+        st.write('#### &emsp;&emsp;2. Algorithm B: Algorithm A - except no filtering for characteristic bins, \
+                instead applying a sample weight = 0.01 (prvents division by 0)', unsafe_allow_html=True)
+        st.write('#### &emsp;&emsp;3. Algorithm C: Multinomial Naïve Bayes method from Scikit-Learn [15], \
+                also where sample weights = 0.01', unsafe_allow_html=True)
+        
+        collapse_button('exp3')
+
     return
     
