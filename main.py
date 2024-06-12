@@ -19,9 +19,10 @@ if 'dfs20' not in st.session_state.keys():
 if 'fds' not in st.session_state.keys():
     st.session_state['dfs'] = rxl.get_all_feature_domains()
 
-sect1CB = st.checkbox("Cover Page")
+sect1CB = st.checkbox("Cover Page", key='s1')
 if sect1CB:
     secs.display_s1()
+    secs.collapse_button('s1')
 
 st.divider()
 
@@ -55,20 +56,8 @@ if sect6CB:
 
 st.divider()
 
-sect7CB = st.checkbox("Experiment 1 - Feature Selection")
+sect7CB = st.checkbox("Experiments")
 if sect7CB:
     secs.display_s7()
-
-st.divider()
-
-sect8CB = st.checkbox("Experiment 2 - Period and Bin Quantity Optimization")
-if sect8CB:
-    secs.display_s8()
-
-st.divider()
-
-sect9CB = st.checkbox("Experiment 3 - Optimized Algorithm Comparisons")
-if sect9CB:
-    secs.display_s9()
 
 st.divider()
