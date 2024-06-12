@@ -22,42 +22,30 @@ if 'fds' not in st.session_state.keys():
 sect1CB = st.checkbox("Cover Page", key='s1')
 if sect1CB:
     secs.display_s1()
-    secs.collapse_button('s1')
+    secs.collapse_button('s1', 'b1')
 
 st.divider()
 
-sect2CB = st.checkbox("Introduction - Business Case")
+sect2CB = st.checkbox("Introduction")
 if sect2CB:
     secs.display_s2()
 
 st.divider()
 
-sect3CB = st.checkbox("Introduction - The Solution, The Problem, Another Solution, Another Problem")
+sect3CB = st.checkbox("Data Source")
 if sect3CB:
     secs.display_s3()
 
 st.divider()
 
-sect4CB = st.checkbox("The Naive Bayes Solution")
+sect4CB = st.checkbox("Algorithm Design")
 if sect4CB:
     secs.display_s4()
 
 st.divider()
 
-sect5CB = st.checkbox("Data Source")
+sect5CB = st.checkbox("Experiments")
 if sect5CB:
     secs.display_s5()
-
-st.divider()
-
-sect6CB = st.checkbox("Algorithm Design")
-if sect6CB:
-    secs.display_s6()
-
-st.divider()
-
-sect7CB = st.checkbox("Experiments")
-if sect7CB:
-    secs.display_s7()
 
 st.divider()

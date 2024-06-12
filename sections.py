@@ -12,10 +12,10 @@ import readxlsxfiles as rxl
 import featureCalcs as FC
 import getgraphs as gg
 
-def collapse_button(key):
+def collapse_button(ckey, bkey):
     def collapse(key):
         st.session_state[key] = False
-    st.button("Collapse this section", on_click=collapse, args=[key])
+    st.button("Collapse this section", on_click=collapse, args=[ckey], key= bkey)
 
 def display_s1():
     st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
@@ -32,158 +32,160 @@ def display_s1():
                 ''')
 
 def display_s2():
-    st.markdown("## Introduction - Business Case")
-    st.markdown(f'''
-                    <ul>
-                        <li>Alliance for Sustainable Energy finds 76% of gearbox failures 2009 – 2015 were caused by faulty bearings [1].</li>
-                        <li>Bearing fault detection will minimize catastrophic failure and maintenance costs.</li>
-                        <li>Many industries can easily rotate the in-service machines with spares to allow a regular maintenance schedule and bearing change-out.</li>
-                        <li>Some industries require many more resources for maintenance than others, driving up costs.</li>
-                    </ul>                
-                    ''', unsafe_allow_html=True)
+    st.markdown("## Introduction")
+    if st.checkbox('Business Case'):
+        st.markdown("## Business Case")
+        st.markdown(f'''
+                        <ul>
+                            <li>Alliance for Sustainable Energy finds 76% of gearbox failures 2009 – 2015 were caused by faulty bearings [1].</li>
+                            <li>Bearing fault detection will minimize catastrophic failure and maintenance costs.</li>
+                            <li>Many industries can easily rotate the in-service machines with spares to allow a regular maintenance schedule and bearing change-out.</li>
+                            <li>Some industries require many more resources for maintenance than others, driving up costs.</li>
+                        </ul>                
+                        ''', unsafe_allow_html=True)
 
 
-    df_lcoe = pd.read_csv('lcoeData.csv', header=None, names=['Renewable Energy Type', 'Lowest Average Cost', 'Highest Average Cost'])
-    df_lcoe = df_lcoe.set_index(['Renewable Energy Type'], drop=True)
-    if st.checkbox("Show Data Table"):
-        st.write(df_lcoe)
-    fig = px.bar(df_lcoe, title="Fixed O&M LCOE ($/MWh) [2]")
-    st.plotly_chart(fig)
-    # table_and_graph(df_loce,
-    #                 graph_note="[2]")
-    col1, col2 = st.columns([0.5, 0.5])
-    col1.image(os.path.join("images", "helicopter image 1.jpg"), caption= "[3]")
-    col2.image(os.path.join("images", "helicopter image 2.jpg"), caption= "[4]")
-    st.write("Estimated helicopter expenditure for offshore wind 2018-2022: $119 million [5]")
-
-def display_s3():
-    st.markdown("## Introduction - The Solution, The Problem, Another Solution, Another Problem")
-    st.markdown("### Like any Good Science project, the more you learn, the more questions you have.")
-    st.markdown('''
-                ### The Solution was Vibration Analysis
-                - Accurate
-                - Nondestructive
-                - Unit Disassembly is not required
-                ### The Problem with Vibration Analysis
-                - Requires Experienced Personnel to accurately interpret
-                - Experienced personnel require much time and money to acquire  
-                ### With Machnine Learning, we can prerform accurate vibration analysis without the need \
-                for personnel training, however...
-                ### Machine Learning algorithms face these issues:''')
-    if st.checkbox("A low number of bearing samples", value=False):
-        # Add histogram data
-        if 'nx1' not in st.session_state.keys():
-            st.session_state['nx1'] = 100
-        if 'nx2' not in st.session_state.keys():
-            st.session_state['nx2'] = 10
-        if 'nx3' not in st.session_state.keys():
-            st.session_state['nx3'] = 2
-
-        def alter_n(sn):
-            st.session_state[sn] = st.session_state[sn + 's']
-            return
-        st.write("Number of Samples:")
-        st.slider('Group 1', key='nx1s', min_value=2, max_value=1000, value= st.session_state['nx1'], on_change=alter_n, args=['nx1'])
-        st.slider('Group 2', key='nx2s', min_value=2, max_value=1000, value= st.session_state['nx2'], on_change=alter_n, args=['nx2'])
-        st.slider('Group 3', key='nx3s', min_value=2, max_value=1000, value= st.session_state['nx3'], on_change=alter_n, args=['nx3'])
-        col1, col2, col3 = st.columns([1,1,1])
-        col1.checkbox("Group 1", key="g1cb", value=True)
-        col2.checkbox("Group 2", key="g2cb", value=True)
-        col3.checkbox("Group 3", key="g3cb", value=True)
-        x1 = np.random.randn(st.session_state['nx1'])
-        x2 = np.random.randn(st.session_state['nx2'])
-        x3 = np.random.randn(st.session_state['nx3'])
-
-        # Group data together
-        st.session_state['hists'] = []
-        st.session_state['groups'] = []
-        
-        if "groups" not in st.session_state.keys():
-            st.session_state['groups'] = []
-            st.session_state['groups'] = []
-
-        if st.session_state["g1cb"]:
-            st.session_state['hists'].append(x1)
-            st.session_state['groups'].append("Group 1")
-
-        if st.session_state["g2cb"]:
-            st.session_state['hists'].append(x2)
-            st.session_state['groups'].append("Group 2")
-
-        if st.session_state["g3cb"]:
-            st.session_state['hists'].append(x3)
-            st.session_state['groups'].append("Group 3")
-
-        # Create distplot with custom bin_size
-        st.session_state["show_hist"] = False
-        if st.checkbox("Show Histograms"):
-            st.session_state["show_hist"] = True
-        fig = ff.create_distplot(st.session_state['hists'], st.session_state['groups'], bin_size=[.1, .25, .5, 1], show_hist=st.session_state["show_hist"])
+        df_lcoe = pd.read_csv('lcoeData.csv', header=None, names=['Renewable Energy Type', 'Lowest Average Cost', 'Highest Average Cost'])
+        df_lcoe = df_lcoe.set_index(['Renewable Energy Type'], drop=True)
+        if st.checkbox("Show Data Table"):
+            st.write(df_lcoe)
+        fig = px.bar(df_lcoe, title="Fixed O&M LCOE ($/MWh) [2]")
         st.plotly_chart(fig)
-        st.write("Look at one group with a historam display.")
-        st.write("As the number of samples rise, the values become more predictable.")
-        st.write("You'll notice as the number of samples drop, more gaps appear in-between bins.")
-        st.write("A machine learning tool will think it's not possible for the class to hold characteristic values \
-                within the open regions, therefore misclassifying the bearing.")
-    if st.checkbox("A large number of data entries per bearing", value=False):
-        st.write("Each bearing dataset can contain hundreds of thousands of entries, \
-                 consuming significant computational resources. \
-                 Therefore, data reduction per bearing sample is much needed. ")
-        st.image(os.path.join('images', 'bearingToDataset.jpeg'), caption='Bearing image [6]')
-    if st.checkbox("A lack of independent sample data", value=False):
-        st.markdown('''
-                    - A single set of vibrational data all comes from one bearing. \
-                    Every line of data carries with it not only the characteristics of the class we \
-                    are trying to distinguish, but also that of the bearing itself.  
-                    To be independent, each entry would come from a different sample \
-                    in the lot - in our case, a bearing.
-                    ''')
-        st.markdown('''
-                    - Also, due to the nature of vibrations, each entry is partly effected by preceeding \
-                    vibrations. For true independence, each entry should have no effect on any other.
-                    ''')
-        st.image(os.path.join('images', 'sampleIndependence.jpeg'))
+        # table_and_graph(df_loce,
+        #                 graph_note="[2]")
+        col1, col2 = st.columns([0.5, 0.5])
+        col1.image(os.path.join("images", "helicopter image 1.jpg"), caption= "[3]")
+        col2.image(os.path.join("images", "helicopter image 2.jpg"), caption= "[4]")
+        st.write("Estimated helicopter expenditure for offshore wind 2018-2022: $119 million [5]")
 
-def display_s4():
-    st.markdown('''
-                ## The Naive Bayes Solution
-                ### Works well despite low sample quantities
-                ### Problematic due to lacking feature independence assumption - ITO?  
-                (In Theory Only?)
-                - Zhang et al. [7] overcame the issue utilizing a Decision Tree (DT) to select low correlated features.
-                - Zhang et al. [8] found success with NB and highly correlated features for bearing \
-                remaining useful life (RUL) prediction; choosing only features >90% correlation.
-                - Furthermore, Hou et al. [9] showed NB can achieve higher accuracy than other models \
-                 with no feature engineering.
-                ## Naive Bayes Mechanics
+    if st.checkbox('The Solution, The Problem, Another Solution, Another Problem'):
+        st.markdown("## Introduction - The Solution, The Problem, Another Solution, Another Problem")
+        st.markdown("### Like any Good Science project, the more you learn, the more questions you have.")
+        st.markdown('''
+                    ### The Solution was Vibration Analysis
+                    - Accurate
+                    - Nondestructive
+                    - Unit Disassembly is not required
+                    ### The Problem with Vibration Analysis
+                    - Requires Experienced Personnel to accurately interpret
+                    - Experienced personnel require much time and money to acquire  
+                    ### With Machnine Learning, we can prerform accurate vibration analysis without the need \
+                    for personnel training, however...
+                    ### Machine Learning algorithms face these issues:''')
+        if st.checkbox("A low number of bearing samples", value=False):
+            # Add histogram data
+            if 'nx1' not in st.session_state.keys():
+                st.session_state['nx1'] = 100
+            if 'nx2' not in st.session_state.keys():
+                st.session_state['nx2'] = 10
+            if 'nx3' not in st.session_state.keys():
+                st.session_state['nx3'] = 2
+
+            def alter_n(sn):
+                st.session_state[sn] = st.session_state[sn + 's']
+                return
+            st.write("Number of Samples:")
+            st.slider('Group 1', key='nx1s', min_value=2, max_value=1000, value= st.session_state['nx1'], on_change=alter_n, args=['nx1'])
+            st.slider('Group 2', key='nx2s', min_value=2, max_value=1000, value= st.session_state['nx2'], on_change=alter_n, args=['nx2'])
+            st.slider('Group 3', key='nx3s', min_value=2, max_value=1000, value= st.session_state['nx3'], on_change=alter_n, args=['nx3'])
+            col1, col2, col3 = st.columns([1,1,1])
+            col1.checkbox("Group 1", key="g1cb", value=True)
+            col2.checkbox("Group 2", key="g2cb", value=True)
+            col3.checkbox("Group 3", key="g3cb", value=True)
+            x1 = np.random.randn(st.session_state['nx1'])
+            x2 = np.random.randn(st.session_state['nx2'])
+            x3 = np.random.randn(st.session_state['nx3'])
+
+            # Group data together
+            st.session_state['hists'] = []
+            st.session_state['groups'] = []
+            
+            if "groups" not in st.session_state.keys():
+                st.session_state['groups'] = []
+                st.session_state['groups'] = []
+
+            if st.session_state["g1cb"]:
+                st.session_state['hists'].append(x1)
+                st.session_state['groups'].append("Group 1")
+
+            if st.session_state["g2cb"]:
+                st.session_state['hists'].append(x2)
+                st.session_state['groups'].append("Group 2")
+
+            if st.session_state["g3cb"]:
+                st.session_state['hists'].append(x3)
+                st.session_state['groups'].append("Group 3")
+
+            # Create distplot with custom bin_size
+            st.session_state["show_hist"] = False
+            if st.checkbox("Show Histograms"):
+                st.session_state["show_hist"] = True
+            fig = ff.create_distplot(st.session_state['hists'], st.session_state['groups'], bin_size=[.1, .25, .5, 1], show_hist=st.session_state["show_hist"])
+            st.plotly_chart(fig)
+            st.write("Look at one group with a historam display.")
+            st.write("As the number of samples rise, the values become more predictable.")
+            st.write("You'll notice as the number of samples drop, more gaps appear in-between bins.")
+            st.write("A machine learning tool will think it's not possible for the class to hold characteristic values \
+                    within the open regions, therefore misclassifying the bearing.")
+        if st.checkbox("A large number of data entries per bearing", value=False):
+            st.write("Each bearing dataset can contain hundreds of thousands of entries, \
+                    consuming significant computational resources. \
+                    Therefore, data reduction per bearing sample is much needed. ")
+            st.image(os.path.join('images', 'bearingToDataset.jpeg'), caption='Bearing image [6]')
+        if st.checkbox("A lack of independent sample data", value=False):
+            st.markdown('''
+                        - A single set of vibrational data all comes from one bearing. \
+                        Every line of data carries with it not only the characteristics of the class we \
+                        are trying to distinguish, but also that of the bearing itself.  
+                        To be independent, each entry would come from a different sample \
+                        in the lot - in our case, a bearing.
+                        ''')
+            st.markdown('''
+                        - Also, due to the nature of vibrations, each entry is partly effected by preceeding \
+                        vibrations. For true independence, each entry should have no effect on any other.
+                        ''')
+            st.image(os.path.join('images', 'sampleIndependence.jpeg'))
+
+    if st.checkbox('The Naive Bayes Solution'):
+        st.markdown('''
+                    ## The Naive Bayes Solution
+                    ### Works well despite low sample quantities
+                    ### Problematic due to lacking feature independence assumption - ITO?  
+                    (In Theory Only?)
+                    - Zhang et al. [7] overcame the issue utilizing a Decision Tree (DT) to select low correlated features.
+                    - Zhang et al. [8] found success with NB and highly correlated features for bearing \
+                    remaining useful life (RUL) prediction; choosing only features >90% correlation.
+                    - Furthermore, Hou et al. [9] showed NB can achieve higher accuracy than other models \
+                    with no feature engineering.
+                    ## Naive Bayes Mechanics
+                    ''')
+        st.write("The posterior probability equation for a class, $c$ given the set of predictors $X$:")
+        pp = r''' 
+        $$ 
+        P(c|X) = \frac{P(c) \times \displaystyle\prod_{i=1}^n P(x_i|c)}{\displaystyle\prod_{i=1}^n P(x_i)}
+        $$ 
+        '''
+        st.write(pp)
+        st.write('''
+                ...where
+                - $c$ is the class for which we want to find the probability
+                - $X$ is a set of predicators, and
+                - $x_i$ $\epsilon$ $X$
                 ''')
-    st.write("The posterior probability equation for a class, $c$ given the set of predictors $X$:")
-    pp = r''' 
-    $$ 
-    P(c|X) = \frac{P(c) \times \displaystyle\prod_{i=1}^n P(x_i|c)}{\displaystyle\prod_{i=1}^n P(x_i)}
-    $$ 
-    '''
-    st.write(pp)
-    st.write('''
-             ...where
-             - $c$ is the class for which we want to find the probability
-             - $X$ is a set of predicators, and
-             - $x_i$ $\epsilon$ $X$
-             ''')
-    st.write('''
-             ...breaking down the left side of the equation
-             - $P(c)$ is the prior probabilty: the chance the class appears at all.
-             - $\displaystyle\prod_{i=1}^n P(x_i)$ is the evidence probability: the chance the predictors occur at all.
-             - $\displaystyle\prod_{i=1}^n P(x_i|c)$ is the likelihood probability: the chance all the predicators in $X$ \
-             occur if the class in question is true
-             ''')
-    st.write('''
-             ### Finally, the probabilities for all classes are calculated and the highest is chosen:
-             $$
-             c_j = argmax(P(c_1|X), P(c_2|X), \ldots, P(c_n|X))
-             $$
-             ''')
-def display_s5():
+        st.write('''
+                ...breaking down the left side of the equation
+                - $P(c)$ is the prior probabilty: the chance the class appears at all.
+                - $\displaystyle\prod_{i=1}^n P(x_i)$ is the evidence probability: the chance the predictors occur at all.
+                - $\displaystyle\prod_{i=1}^n P(x_i|c)$ is the likelihood probability: the chance all the predicators in $X$ \
+                occur if the class in question is true
+                ''')
+        st.write('''
+                ### Finally, the probabilities for all classes are calculated and the highest is chosen:
+                $$
+                c_j = argmax(P(c_1|X), P(c_2|X), \ldots, P(c_n|X))
+                $$
+                ''')
+def display_s3():
     st.markdown('### Test Rig')
     st.image(os.path.join('images', 'testRig.jpg'), caption='Test Rig Set-Up [10]')
     st.write('''
@@ -205,7 +207,7 @@ def display_s5():
                 - decreasing then increasing speed
              - 3 samples were taken for each health and speed condition combination
              ''')
-def display_s6():
+def display_s4():
     st.markdown("## Algorith Design")
     if st.checkbox("### Pseudocode 1 - Feature - Domain Engineering", value=False, key='p1'):
         st.write("Bearing Vibration Features are used for data reduction per vibration dataset. \
@@ -223,8 +225,8 @@ def display_s6():
         st.markdown(cap)
         st.markdown('## Data Reduction with features aggregrated in periods...')
         nPeriods_value = st.slider("Number of Periods", min_value=2, max_value=100, value=100)
-        feature = st.radio("Feature", options= ['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin', 'Mean'])
-        domain = st.radio("Domain", options=["Velocity", "Acceleration"])
+        feature = st.radio("Feature", options= ['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin', 'Mean'], key='r1')
+        domain = st.radio("Domain", options=["Velocity", "Acceleration"], key='r2')
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
         ndf = st.session_state.get('2M_sample_df')[['shaft speed', 'vibration velocity']]
         df2 = gdata.get_dataframe_subset_for_sample(ndf, nPeriods_value, feature, domain)
@@ -251,7 +253,7 @@ def display_s6():
                     6. Append $A$ to $V$  
                  3. Return $V$
                  ''', unsafe_allow_html=True)
-        collapse_button('p1')
+        collapse_button('p1', 'b2')
 
     if st.checkbox("### Pseudocode 2 - Training", value=False, key='p2'):
         st.markdown('## The range is divided in bins. Frequencies of each class is caluclated for each bin.')
@@ -318,7 +320,7 @@ def display_s6():
                     9. Create dictionary $C | $ class label = array $T_{training}$ containing bin identifiers for all bins occupied by that class
                  2. Return $P_c, B, P_{bp|c}, P_{bp}, C$
                  ''', unsafe_allow_html=True)
-        collapse_button('p2')
+        collapse_button('p2', 'b3')
 
     if st.checkbox("### Pseudocode 3: Naïve Bayes Algorithm with Characteristic Bin Utilization", value=False, key='p3'):
         st.markdown("#### A Characteristic Bin for a class is one that holds at least one data point from all instances in the class.")
@@ -349,15 +351,16 @@ def display_s6():
                 2. Class Prediction = $argmax(F)$
                 3. Return Class Prediction
                  ''', unsafe_allow_html=True)
-        collapse_button('p3')
+        collapse_button('p3', 'b4')
 
-def display_s7():
-    if st.checkbox("Experiment 1 - Feature-Domain Selection", key='exp1'):
-        st.markdown("## Experiment 1 - Feature-Domain Selection")
-        feature = st.radio("Feature", options=['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin'])
+def display_s5():
+    st.markdown('## Experiments')
+    if st.checkbox("Experiment 1: Feature-Domain Selection", key='exp1'):
+        st.markdown("## Experiment 1: Feature-Domain Selection")
+        feature = st.radio("Feature", options=['Skewness','Kurtosis','Crest', 'Shape', 'Impulse','Margin'], key='r3')
         st.markdown(feature + ': ' + FC.get_equation(feature.lower())[0])
         st.markdown(FC.get_equation(feature.lower())[1])
-        domain = st.radio("Domain", options=["Velocity", "Acceleration"])
+        domain = st.radio("Domain", options=["Velocity", "Acceleration"], key='r4')
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;justify-content: center}</style>', unsafe_allow_html=True)
         df = rxl.get_feature_domain_20p(feature + domain)
         fig = px.line(df, x= 'period', y=df.columns)
@@ -379,11 +382,11 @@ def display_s7():
         fig = px.box(dfBP, y=dfBP.columns, labels={'value': 'Accuracy', 'variable': 'Feature-Domain'})
         st.plotly_chart(fig)
 
-        collapse_button('exp1')
+        collapse_button('exp1', 'b5')
         st.divider()
 
-    if st.checkbox("Experiment 2 - Period and Bin Quantity Optimization", key='exp2'):
-        st.markdown("## Experiment 2 - Period and Bin Quantity Optimization")
+    if st.checkbox("Experiment 2: Period and Bin Quantity Optimization", key='exp2'):
+        st.markdown("## Experiment 2: Period and Bin Quantity Optimization")
         st.write('### Goal: Find the minimum number of periods and bins to achieve maximum prediction accuracy.')
         st.write('### Procedure:')
         st.write('#### &emsp;Variables:', unsafe_allow_html=True)
@@ -433,21 +436,58 @@ def display_s7():
         st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;90 bins per periods and 80 periods', unsafe_allow_html=True)
         st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;100 bins per periods and 100 periods', unsafe_allow_html=True)
 
-        collapse_button('exp2')
+        collapse_button('exp2', 'b6')
         st.divider()
 
-    if st.checkbox('Experiment 3 - Optimized Algorithm Comparisons', key='exp3'):
-        st.markdown('## Experiment 3 - Optimized Algorithm Comparisons')
+    if st.checkbox('Experiment 3: Optimized Algorithm Comparisons', key='exp3'):
+        st.markdown('## Experiment 3: Optimized Algorithm Comparisons')
         st.write('### Goal: Compare 3 classifers for prediction accuracy and time.')
+        st.write('### Method:')
+        st.write('#### &emsp;&emsp;1. All classifiers were trained and tested with the same data.', unsafe_allow_html=True)
+        st.write('#### &emsp;&emsp;2. Raw data was converted to a Feature-Domain of \
+                 Kurtosis-Acceleration with 80 periods using Psuedocode 1.', unsafe_allow_html=True)
         st.write('#### Algorithms:')
-        st.write('#### &emsp;&emsp;1. Algorithm A: Pseudocode 3 with Kurtosis-Acceleration, 80 bins per period, \
-                and 90 periods', unsafe_allow_html=True)
+        st.write('#### &emsp;&emsp;1. Algorithm A: Pseudocode 3 with 90 bins per period', unsafe_allow_html=True)
         st.write('#### &emsp;&emsp;2. Algorithm B: Algorithm A - except no filtering for characteristic bins, \
-                instead applying a sample weight = 0.01 (prvents division by 0)', unsafe_allow_html=True)
+                instead applying a sample weight = 0.01 (prevents division by 0)', unsafe_allow_html=True)
         st.write('#### &emsp;&emsp;3. Algorithm C: Multinomial Naïve Bayes method from Scikit-Learn [15], \
                 also where sample weights = 0.01', unsafe_allow_html=True)
         
-        collapse_button('exp3')
+        # Set-up Dataframe
+        colsMethod = ['Algorithm', 'Feature-Domain', 'Number of Periods', 'Training Method', 'Classifying Method', 'Bins per Period', 'Characteristic Bin Utilization', 'Sample Weights']
+        dataMethod = [
+            ['A', 'Kurtosis-Acceleration', 80, 'Pseudocode 2', 'Pseudocode 3', 90, 'Yes', 'None'],
+            ['B', 'Kurtosis-Acceleration', 80, 'Pseudocode 2', 'Pseudocode 3 (note a)', 90, 'No', 0.01],
+            ['C', 'Kurtosis-Acceleration', 80, 'Multinomial Naïve Bayes method from Scikit-Learn','Multinomial Naïve Bayes method from Scikit-Learn', 'NA', 'NA', 0.01]
+        ]
+        dfMethod = pd.DataFrame(dataMethod, columns=colsMethod)
+        dfMethod = dfMethod.set_index('Algorithm', drop=True)
+        st.write('### Test Set-Up')
+        st.write(dfMethod.to_html(), unsafe_allow_html=True)
+        st.write('Notes: <sup>a</sup> With exception to characteristic bin filtering.', unsafe_allow_html=True)
+        st.divider()
 
-    return
+        # Results Data
+        cols = ['Algorithm', 'Mean', 'Std. Dev.', 'Min', 'Max', 'Median', '25%', '75%']
+        exp3_Accdata = [
+            ['A', 93.267, 3.531, 86.667, 100.000, 93.333, 93.333, 96.667],
+            ['B', 59.000, 1.684, 56.667, 63.333, 60.000, 56.667, 60.000],
+            ['C', 46.200, 5.871, 33.333, 63.333, 46.667, 43.333, 50.000]
+        ]
+        exp3_Timedata = [
+            ['A & B', 221.121, 21.464, 206.639, 285.871, 219.027, 208.281, 220.406],
+            ['C', 0.001, 0.001, 0.000, 0.003, 0.001, 0.001, 0.002]
+        ]
+
+        dfAcc = pd.DataFrame(exp3_Accdata, columns=cols)
+        dfTime = pd.DataFrame(exp3_Timedata, columns=cols)
+        dfAcc = dfAcc.set_index('Algorithm', drop=True)
+        dfTime = dfTime.set_index('Algorithm', drop=True)
+
+        st.write("### Results...")
+        st.write("#### Classifier Accuracy Percentage Summary Statistics with KA, 80 Periods, 90 Bins per Period, and n = 50")
+        st.dataframe(dfAcc, use_container_width=True)
+        st.write('#### Classifier Training Time in Seconds, n = 50')
+        st.dataframe(dfTime, use_container_width=True)
+        collapse_button('exp3', 'b7')
     
