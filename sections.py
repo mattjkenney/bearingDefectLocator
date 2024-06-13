@@ -489,5 +489,27 @@ def display_s5():
         st.dataframe(dfAcc, use_container_width=True)
         st.write('#### Classifier Training Time in Seconds, n = 50')
         st.dataframe(dfTime, use_container_width=True)
+        st.write("### Key Takeaways:")
+        st.write("#### Compared to Scikit-Learn, my proposed Algorithm")
+        st.write("#### &emsp;&emsp;&emsp;&emsp;$\cdot$ takes roughly 3-1/2 minutes longer to train, but")
+        st.write("#### &emsp;&emsp;&emsp;&emsp;$\cdot$ is significantly more accurate.")
         collapse_button('exp3', 'b7')
-    
+
+def display_s6():
+    st.markdown('## Discussion')
+    st.write('### &emsp;&emsp;1. Increasing bin quantities will raise accuracy - in theory and in practice:')
+    st.write('### &emsp;&emsp;&emsp;&emsp;More bins, means more factors to consider.')
+    st.write('### &emsp;&emsp;2. Kurtosis-Acceleration as a feature-domain shows better distinction between classes than \
+             Crest-Acceleration.')
+    # graph comparisons
+    if st.checkbox("see graphical comparison..."):
+        fig = gg.get_discussion_subplots()
+        st.plotly_chart(fig)
+    st.write('### &emsp;&emsp;3. Significant trade-off of training time for accuracy.')
+    st.divider()
+    st.markdown('## Future development suggesstions:')
+    st.write('### &emsp;&emsp;1. Running two models in series - ')
+    st.write('### &emsp;&emsp;&emsp;&emsp;1. To distinguish if the fault is inner race or combination fault, then')
+    st.write('### &emsp;&emsp;&emsp;&emsp;2. To distinguish the others.')
+    st.write('### &emsp;&emsp;2. Dynamic bin quanities per period based on margins.')
+    st.write('### &emsp;&emsp;3. Improve time with better coding.')

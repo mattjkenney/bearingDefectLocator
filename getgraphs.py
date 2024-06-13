@@ -2,6 +2,23 @@ import plotly.express as px
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
 import readxlsxfiles as rxl
+from plotly.subplots import make_subplots
+import pandas as pd
+
+def get_discussion_subplots():
+
+    dfKA = rxl.get_feature_domain_20p('Kurtosis' + 'Acceleration')
+    dfCA = rxl.get_feature_domain_20p('Crest' + 'Acceleration')
+
+    dfKA['FD'] = ['Kurtosis-Acceleration' for _ in range(dfKA.shape[0])]
+    dfCA['FD'] = ['Crest-Acceleration' for _ in range(dfCA.shape[0])]
+
+    dfm = pd.concat([dfKA, dfCA], ignore_index=True)
+    ys = ['healthy', 'inner race', 'outer race', 'ball', 'combination']
+
+    fig = px.line(dfm, x='period', y =dfm.columns, facet_col = 'FD', labels={'value': 'mean feature'})
+
+    return fig
 
 def get_exp2_graphs(dfs: list):
 
@@ -23,11 +40,8 @@ def get_exp2_graphs(dfs: list):
 
 def test():
 
-    dfexp2 = rxl.get_exp2_df()
-    dfCA = dfexp2[dfexp2['FD'] == 0].reset_index(drop=True)
-    dfKA = dfexp2[dfexp2['FD'] == 1].reset_index(drop=True)
-    (figCA, figKA) = get_exp2_graphs([dfCA, dfKA])
-    print(dfKA)
+    fig = get_discussion_subplots()
+    fig.show()
 
 if __name__ == "__main__":
     test()

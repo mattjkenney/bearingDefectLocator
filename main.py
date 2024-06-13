@@ -49,3 +49,9 @@ if sect5CB:
     secs.display_s5()
 
 st.divider()
+
+sect6CB = st.checkbox("Discussion")
+if sect6CB:
+    secs.display_s6()
+
+st.divider()
