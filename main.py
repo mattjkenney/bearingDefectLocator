@@ -19,39 +19,57 @@ if 'dfs20' not in st.session_state.keys():
 if 'fds' not in st.session_state.keys():
     st.session_state['dfs'] = rxl.get_all_feature_domains()
 
-sect1CB = st.checkbox("Cover Page", key='s1')
+st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
+st.markdown("""
+                ### Matthew Kenney  
+                ### B.S. Data Science, Post University  
+                ### QM Analyst/Jr. Developer at Spring Point Solutions, LLC""")
+st.divider()
+sect1CB = st.checkbox("Abstract", key='s1')
 if sect1CB:
     secs.display_s1()
-    secs.collapse_button('s1', 'b1')
+    secs.collapse_button('s1', 'bs1')
 
 st.divider()
 
-sect2CB = st.checkbox("Introduction")
+sect2CB = st.checkbox("Introduction", key='s2')
 if sect2CB:
     secs.display_s2()
+    secs.collapse_button('s2', 'bs2')
 
 st.divider()
 
-sect3CB = st.checkbox("Data Source")
+sect3CB = st.checkbox("Data Source", key='s3')
 if sect3CB:
     secs.display_s3()
+    secs.collapse_button('s3', 'bs3')
 
 st.divider()
 
-sect4CB = st.checkbox("Algorithm Design")
+sect4CB = st.checkbox("Algorithm Design", key='s4')
 if sect4CB:
     secs.display_s4()
+    secs.collapse_button('s4', 'bs4')
 
 st.divider()
 
-sect5CB = st.checkbox("Experiments")
+sect5CB = st.checkbox("Experiments", key='s5')
 if sect5CB:
     secs.display_s5()
+    secs.collapse_button('s5', 'bs5')
 
 st.divider()
 
-sect6CB = st.checkbox("Discussion")
+sect6CB = st.checkbox("Discussion", key='s6')
 if sect6CB:
     secs.display_s6()
+    secs.collapse_button('s6', 'bs6')
+
+st.divider()
+
+sect7CB = st.checkbox("References", key='s7')
+if sect7CB:
+    secs.display_s7()
+    secs.collapse_button('s7', 'bs7')
 
 st.divider()

@@ -11,6 +11,7 @@ from original_files.classBayesModel3 import BearingConditionPredictor as BCP
 import readxlsxfiles as rxl
 import featureCalcs as FC
 import getgraphs as gg
+import numpy as np
 
 def collapse_button(ckey, bkey):
     def collapse(key):
@@ -18,33 +19,21 @@ def collapse_button(ckey, bkey):
     st.button("Collapse this section", on_click=collapse, args=[ckey], key= bkey)
 
 def display_s1():
-    st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
-    st.markdown("""
-                ### Matthew Kenney  
-                ### B.S. Data Science, Post University  
-                ### QM Analyst/Jr. Developer at Spring Point Solutions, LLC""")
-    st.markdown('''
-                My paper proposes a solution to improve a Naïve Bayes classifier for bearing fault location detection.
-                Improvements are achieved in three ways:
-                - Limiting predictors to Characteristic Bins
-                - Analyzing the optimal feature-domain set
-                - Perfecting the number of bins and periods for aggregating and calculating features
-                ''')
+    st.markdown('## Abstract')
+    st.write('#### My paper proposes a solution to improve a Naïve Bayes classifier for bearing fault location detection')
+    st.write('#### Improvements are achieved in three ways:')
+    st.write('#### &emsp;&emsp;1. Limiting predictors to Characteristic Bins')
+    st.write('#### &emsp;&emsp;2. Analyzing the optimal feature-domain set')
+    st.write('#### &emsp;&emsp;3. Perfecting the number of bins and periods for aggregating and calculating features')
 
 def display_s2():
     st.markdown("## Introduction")
     if st.checkbox('Business Case'):
         st.markdown("## Business Case")
-        st.markdown(f'''
-                        <ul>
-                            <li>Alliance for Sustainable Energy finds 76% of gearbox failures 2009 – 2015 were caused by faulty bearings [1].</li>
-                            <li>Bearing fault detection will minimize catastrophic failure and maintenance costs.</li>
-                            <li>Many industries can easily rotate the in-service machines with spares to allow a regular maintenance schedule and bearing change-out.</li>
-                            <li>Some industries require many more resources for maintenance than others, driving up costs.</li>
-                        </ul>                
-                        ''', unsafe_allow_html=True)
-
-
+        st.write('#### &emsp;1. Alliance for Sustainable Energy finds 76% of gearbox failures 2009 – 2015 were caused by faulty bearings [1].')
+        st.write('#### &emsp;2. Bearing fault detection will minimize catastrophic failure and maintenance costs')
+        st.write('#### &emsp;3. Many industries can easily rotate the in-service machines with spares to allow a regular maintenance schedule and bearing change-out.')
+        st.write('#### &emsp;4. Some industries require many more resources for maintenance than others, driving up costs.')
         df_lcoe = pd.read_csv('lcoeData.csv', header=None, names=['Renewable Energy Type', 'Lowest Average Cost', 'Highest Average Cost'])
         df_lcoe = df_lcoe.set_index(['Renewable Energy Type'], drop=True)
         if st.checkbox("Show Data Table"):
@@ -59,20 +48,21 @@ def display_s2():
         st.write("Estimated helicopter expenditure for offshore wind 2018-2022: $119 million [5]")
 
     if st.checkbox('The Solution, The Problem, Another Solution, Another Problem'):
-        st.markdown("## Introduction - The Solution, The Problem, Another Solution, Another Problem")
+        st.markdown("## The Solution, The Problem, Another Solution, Another Problem")
         st.markdown("### Like any Good Science project, the more you learn, the more questions you have.")
         st.markdown('''
                     ### The Solution was Vibration Analysis
-                    - Accurate
-                    - Nondestructive
-                    - Unit Disassembly is not required
+                    #### &emsp;&emsp;1. Accurate
+                    #### &emsp;&emsp;2. Nondestructive
+                    #### &emsp;&emsp;3. Unit Disassembly is not required
                     ### The Problem with Vibration Analysis
-                    - Requires Experienced Personnel to accurately interpret
-                    - Experienced personnel require much time and money to acquire  
+                    #### &emsp;&emsp;1. Requires Experienced Personnel to accurately interpret
+                    #### &emsp;&emsp;2. Experienced personnel require much time and money to acquire  
                     ### With Machnine Learning, we can prerform accurate vibration analysis without the need \
                     for personnel training, however...
-                    ### Machine Learning algorithms face these issues:''')
-        if st.checkbox("A low number of bearing samples", value=False):
+                    ### Machine Learning algorithms face these issues:
+                    #### &emsp;&emsp;1. Low number of bearing samples''')
+        if st.checkbox("see explanation", value=False, key='p1'):
             # Add histogram data
             if 'nx1' not in st.session_state.keys():
                 st.session_state['nx1'] = 100
@@ -122,29 +112,33 @@ def display_s2():
                 st.session_state["show_hist"] = True
             fig = ff.create_distplot(st.session_state['hists'], st.session_state['groups'], bin_size=[.1, .25, .5, 1], show_hist=st.session_state["show_hist"])
             st.plotly_chart(fig)
-            st.write("Look at one group with a historam display.")
-            st.write("As the number of samples rise, the values become more predictable.")
-            st.write("You'll notice as the number of samples drop, more gaps appear in-between bins.")
-            st.write("A machine learning tool will think it's not possible for the class to hold characteristic values \
+            st.write("#### Look at one group with a historam display.")
+            st.write("#### As the number of samples rise, the values become more predictable.")
+            st.write("#### You'll notice as the number of samples drop, more gaps appear in-between bins.")
+            st.write("#### A machine learning tool will think it's not possible for the class to hold characteristic values \
                     within the open regions, therefore misclassifying the bearing.")
-        if st.checkbox("A large number of data entries per bearing", value=False):
-            st.write("Each bearing dataset can contain hundreds of thousands of entries, \
+            collapse_button('p1', 'bp1')
+        st.write("#### &emsp;&emsp;2. A large number of data entries per bearing.")
+        if st.checkbox("see explanation", value=False, key='p2'):
+            st.write("#### Each bearing dataset can contain hundreds of thousands of entries, \
                     consuming significant computational resources. \
                     Therefore, data reduction per bearing sample is much needed. ")
             st.image(os.path.join('images', 'bearingToDataset.jpeg'), caption='Bearing image [6]')
-        if st.checkbox("A lack of independent sample data", value=False):
+            collapse_button('p2', 'bp2')
+        st.write("#### &emsp;&emsp;3. A lack of independent sample data")
+        if st.checkbox("see explanation", value=False, key='p3'):
             st.markdown('''
-                        - A single set of vibrational data all comes from one bearing. \
+                        #### A single set of vibrational data all comes from one bearing. \
                         Every line of data carries with it not only the characteristics of the class we \
                         are trying to distinguish, but also that of the bearing itself.  
-                        To be independent, each entry would come from a different sample \
+                        #### To be independent, each entry would come from a different sample \
                         in the lot - in our case, a bearing.
-                        ''')
-            st.markdown('''
-                        - Also, due to the nature of vibrations, each entry is partly effected by preceeding \
+                        #### Also, due to the nature of vibrations, each entry is partly effected by preceeding \
                         vibrations. For true independence, each entry should have no effect on any other.
                         ''')
             st.image(os.path.join('images', 'sampleIndependence.jpeg'))
+            collapse_button('p3', 'bp3')
+        st.divider()
 
     if st.checkbox('The Naive Bayes Solution'):
         st.markdown('''
@@ -253,7 +247,7 @@ def display_s4():
                     6. Append $A$ to $V$  
                  3. Return $V$
                  ''', unsafe_allow_html=True)
-        collapse_button('p1', 'b2')
+        collapse_button('p1', 'bp1')
 
     if st.checkbox("### Pseudocode 2 - Training", value=False, key='p2'):
         st.markdown('## The range is divided in bins. Frequencies of each class is caluclated for each bin.')
@@ -320,7 +314,7 @@ def display_s4():
                     9. Create dictionary $C | $ class label = array $T_{training}$ containing bin identifiers for all bins occupied by that class
                  2. Return $P_c, B, P_{bp|c}, P_{bp}, C$
                  ''', unsafe_allow_html=True)
-        collapse_button('p2', 'b3')
+        collapse_button('p2', 'bp2')
 
     if st.checkbox("### Pseudocode 3: Naïve Bayes Algorithm with Characteristic Bin Utilization", value=False, key='p3'):
         st.markdown("#### A Characteristic Bin for a class is one that holds at least one data point from all instances in the class.")
@@ -351,7 +345,7 @@ def display_s4():
                 2. Class Prediction = $argmax(F)$
                 3. Return Class Prediction
                  ''', unsafe_allow_html=True)
-        collapse_button('p3', 'b4')
+        collapse_button('p3', 'bp3')
 
 def display_s5():
     st.markdown('## Experiments')
@@ -382,7 +376,7 @@ def display_s5():
         fig = px.box(dfBP, y=dfBP.columns, labels={'value': 'Accuracy', 'variable': 'Feature-Domain'})
         st.plotly_chart(fig)
 
-        collapse_button('exp1', 'b5')
+        collapse_button('exp1', 'bexp1')
         st.divider()
 
     if st.checkbox("Experiment 2: Period and Bin Quantity Optimization", key='exp2'):
@@ -436,7 +430,7 @@ def display_s5():
         st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;90 bins per periods and 80 periods', unsafe_allow_html=True)
         st.write('####   &emsp;&emsp;&emsp;&emsp;&emsp;100 bins per periods and 100 periods', unsafe_allow_html=True)
 
-        collapse_button('exp2', 'b6')
+        collapse_button('exp2', 'bexp2')
         st.divider()
 
     if st.checkbox('Experiment 3: Optimized Algorithm Comparisons', key='exp3'):
@@ -493,7 +487,7 @@ def display_s5():
         st.write("#### Compared to Scikit-Learn, my proposed Algorithm")
         st.write("#### &emsp;&emsp;&emsp;&emsp;$\cdot$ takes roughly 3-1/2 minutes longer to train, but")
         st.write("#### &emsp;&emsp;&emsp;&emsp;$\cdot$ is significantly more accurate.")
-        collapse_button('exp3', 'b7')
+        collapse_button('exp3', 'bexp3')
 
 def display_s6():
     st.markdown('## Discussion')
@@ -513,3 +507,31 @@ def display_s6():
     st.write('### &emsp;&emsp;&emsp;&emsp;2. To distinguish the others.')
     st.write('### &emsp;&emsp;2. Dynamic bin quanities per period based on margins.')
     st.write('### &emsp;&emsp;3. Improve time with better coding.')
+
+def display_s7():
+    st.markdown('## References')
+    rfs = "[1]Alliance for Sustainable Energy, LLC, “Gearbox Reliability Database,” grd.nrel.gov, 2016. https://grd.nrel.gov/stats (accessed Apr. 03, 2024).[2]G. Bilicic and S. Scroggins, “Lazard’s Levelized Cost of Energy Analysis—Version  16.0,” LAZARD, 2023. Accessed: Apr. 04, 2024. [Online]. Available: https://www.lazard.com/research-insights/2023-levelized-cost-of-energyplus/[3]Bond Aviation Group, Offshore Wind Industry Could Spend USD 119 Million on Helicopters by 2022. 2017. Accessed: Apr. 03, 2024. [Online Image]. Available: https://www.offshorewind.biz/2017/12/07/offshore-wind-industry-could-spend-usd-119-million-on-helicopters-by-2022/[4]EXPO21XX GmbH, Onshore and Offshore Wind Turbine Maintenance and Repair by Deutsche Windtechnik. EXPO21XX GmbH, 1997. Accessed: Apr. 03, 2024. [Online Image]. Available: https://www.expo21xx.com/wind-energy/19219_st2_offshore-wind-construction/default.htm[5]Navingo, “Offshore Wind Industry Could Spend USD 119 Million on Helicopters by 2022,” Offshore Wind, Dec. 07, 2017. https://www.offshorewind.biz/2017/12/07/offshore-wind-industry-could-spend-usd-119-million-on-helicopters-by-2022/ (accessed Apr. 04, 2024).[6]CARiD.com, Timken® 8604 - Generator Drive End Bearing. 2003. [Online Image]. Available: https://www.carid.com/timken/generator-drive-end-bearing-mpn-8604.html[7]N. Zhang, L. Wu, J. Yang, and Y. Guan, “Naive Bayes Bearing Fault Diagnosis Based on Enhanced Independence of Data,” Sensors, vol. 18, no. 2, p. 463, Feb. 2018, doi: https://doi.org/10.3390/s18020463.[8]N. Zhang, L. Wu, Z. Wang, and Y. Guan, “Bearing Remaining Useful Life Prediction Based on Naive Bayes and Weibull Distributions,” Entropy, vol. 20, no. 12, p. 944, Dec. 2018, doi: https://doi.org/10.3390/e20120944.[9]P. Hou, X. J. Yi, and Y. F. Chen, “Fault diagnosis of rolling element bearing using Naïve Bayes classifier,” Vibroengineering PROCEDIA, vol. 14, pp. 64–69, Oct. 2017, doi: https://doi.org/10.21595/vp.2017.19153.[10]H. Huang and N. Baddour, “Bearing vibration data collected under time-varying rotational speed conditions,” Data in Brief, vol. 21, pp. 1745–1749, Dec. 2018, doi: https://doi.org/10.1016/j.dib.2018.11.019.[11]National Institute of Standards and Technology, “1.3.5.11. Measures of Skewness and Kurtosis,” Nist.gov, 2019. https://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm[12]Mobius Institue, “Vibration Analysis Dictionary: Terms - Mobius Institute,” Mobius Institute, 2023. https://www.mobiusinstitute.com/vibration-analysis-dictionary (accessed Jun. 06, 2024).[13]Stephanie Glen, “Shape Parameter: Definition and Examples,” Statistics How To, 2023. https://www.statisticshowto.com/shape-parameter/[14]The MathWorks Inc., “Signal Features - MATLAB & Simulink,” www.mathworks.com, 2023. https://www.mathworks.com/help/predmaint/ug/signal-features.html[15]F. Pedregosa et al., “Scikit-learn: Machine Learning in Python,” Journal of Machine Learning Research, vol. 12, pp. 2825–2830, 2011."
+    add_break = []
+    for r in range(len(rfs)):
+        try:
+            if rfs[r].isnumeric() and rfs[r - 1] == '[':
+                add_break.append(r - 2)
+        except:
+            pass
+
+    add_i = -4
+    for b in add_break:
+        add_i += 4
+        rfs = rfs[:b + add_i + 1] + '<br>' + rfs[b + add_i + 1:]
+
+    add_space = []
+    for r in range(len(rfs)):
+        if rfs[r].isnumeric() and rfs[r + 1] == ']':
+            add_space.append(r + 2)
+
+    add_i = -6
+    for s in add_space:
+        add_i += 6
+        rfs = rfs[:s + add_i] + '&emsp;' + rfs[s + add_i:]
+
+    st.write(rfs, unsafe_allow_html=True)
