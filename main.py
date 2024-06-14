@@ -1,13 +1,8 @@
 import streamlit as st
-import streamlit.components.v1 as components
-import pandas as pd
-import plotly.express as px
-from data_widget import table_and_graph
 import sections as secs
 import getdatafile as gdata
-import sqlite3
-import os
 import readxlsxfiles as rxl
+import contact as con
 
 if '2M_sample_df' not in st.session_state.keys():
     df2M = gdata.get_dataframe_from_label('healthy', 1)
@@ -23,7 +18,11 @@ st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection"
 st.markdown("""
                 ### Matthew Kenney  
                 ### B.S. Data Science, Post University  
-                ### QM Analyst/Jr. Developer at Spring Point Solutions, LLC""")
+                ### QM Analyst/Jr. Developer at Spring Point Solutions, LLC
+
+                mattjkenney@protonmail.com""")
+# include line below in future revision to allow in-page emails
+# con.contact_form_button()
 st.divider()
 sect1CB = st.checkbox("Abstract", key='s1')
 if sect1CB:
