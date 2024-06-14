@@ -3,11 +3,8 @@ import pandas as pd
 import os
 import plotly.express as px
 import plotly.figure_factory as ff
-import plotly.graph_objects as go
 import numpy as np
 import getdatafile as gdata
-from original_files.classBearingFeatures2 import BearingFeatures as BF
-from original_files.classBayesModel3 import BearingConditionPredictor as BCP
 import readxlsxfiles as rxl
 import featureCalcs as FC
 import getgraphs as gg
