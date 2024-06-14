@@ -4,33 +4,11 @@ import pickle as pk
 from scipy.io import loadmat
 from original_files.classBearingFeatures2 import BearingFeatures as BF
 import numpy as np
-import sqlalchemy as sqla
-import yaml
-from sqlalchemy import Engine
 import pandas as pd
-from original_files.classBayesModel3 import BearingConditionPredictor as BCP
 
-os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'../.aws/bearingDefectLocator/credentials'
-os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
-os.environ['DB_CREDENTIALS_FILE'] = r'/home/mattjkenney/projects/.aws/bearingDefectLocator/db.yaml'
-
-def get_engine():
-
-    with open(os.environ['DB_CREDENTIALS_FILE'], 'r') as filehandle:
-        file = yaml.safe_load(filehandle)
-
-    engURL = sqla.URL.create(
-        drivername= "postgresql+psycopg2",
-        username= file.get('master_username'),
-        password= file.get('master_password'),
-        port= 5432,
-        host= file.get('endpoint'),
-        database="bearingvibrations"     
-    )
-    
-    engine = sqla.create_engine(engURL)
-    
-    return engine
+# use lines below to run locally
+# os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'../.aws/bearingDefectLocator/credentials'
+# os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
 def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, feat, domain):
 
