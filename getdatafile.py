@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 
 # use lines below to run locally
-st.write(os.getcwd())
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/app/root/.aws/credentials'
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
@@ -23,6 +22,8 @@ def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, fea
     return df
 
 def get_dataframe_from_label(label, qty=12):
+
+    st.write(os.getcwd())
 
     with open('vibs.pk', 'rb') as filehandle:
         keyDict = pk.load(filehandle)
