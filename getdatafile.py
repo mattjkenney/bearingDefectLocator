@@ -5,6 +5,7 @@ from scipy.io import loadmat
 from original_files.classBearingFeatures2 import BearingFeatures as BF
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 st.write(os.path.isfile(r'/app/root/.aws/credentials'))
 
