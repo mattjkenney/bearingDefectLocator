@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 # use lines below to run locally
+st.write(os.getcwd())
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/app/root/.aws/credentials'
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
