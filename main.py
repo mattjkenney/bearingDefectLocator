@@ -2,6 +2,9 @@ import streamlit as st
 import sections as secs
 import getdatafile as gdata
 import readxlsxfiles as rxl
+import os
+
+st.write(os.getcwd())
 
 if '2M_sample_df' not in st.session_state.keys():
     df2M = gdata.get_dataframe_from_label('healthy', 1)
