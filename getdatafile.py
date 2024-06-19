@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 # use lines below to run locally
-os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/root/.aws/credentials'
+os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/app/root/.aws/credentials'
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
 def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, feat, domain):
