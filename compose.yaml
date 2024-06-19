@@ -1,0 +1,22 @@
+services:
+  app:
+    build: . 
+    ports:
+      - "8501:8501"
+    secrets:
+      - AWS_CRED
+      - AWS_CONF
+    environment:
+      AWS_SHARED_CREDENTIALS_FILE: /run/secrets/AWS_CRED
+      AWS_CONFIG_FILE: /run/secrets/AWS_CONF
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: /app
+
+secrets:
+  AWS_CRED:
+    file: ../.aws/credentials
+  AWS_CONF:
+    file: ../.aws/config
