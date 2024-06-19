@@ -23,8 +23,6 @@ def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, fea
 
 def get_dataframe_from_label(label, qty=12):
 
-    st.write(str(os.getcwd()))
-
     with open('vibs.pk', 'rb') as filehandle:
         keyDict = pk.load(filehandle)
     keys = keyDict.get(label)
