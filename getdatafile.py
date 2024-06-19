@@ -6,6 +6,8 @@ from original_files.classBearingFeatures2 import BearingFeatures as BF
 import numpy as np
 import pandas as pd
 
+st.write(os.path.isfile(r'/app/root/.aws/credentials'))
+
 # use lines below to run locally
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/app/root/.aws/credentials'
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
