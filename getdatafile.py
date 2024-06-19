@@ -9,7 +9,7 @@ import streamlit as st
 
 # use lines below to run locally
 fp = os.path.join(os.getcwd(), '.aws', 'credentials')
-os.path.isfile(fp)
+st.write(os.path.isfile(fp))
 st.write(fp)
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = fp
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
