@@ -4,17 +4,15 @@ import getdatafile as gdata
 import readxlsxfiles as rxl
 import os
 
-st.write(os.getcwd())
+if '2M_sample_df' not in st.session_state.keys():
+    df2M = gdata.get_dataframe_from_label('healthy', 1)
+    st.session_state['2M_sample_df'] = df2M
 
-# if '2M_sample_df' not in st.session_state.keys():
-#     df2M = gdata.get_dataframe_from_label('healthy', 1)
-#     st.session_state['2M_sample_df'] = df2M
+if 'dfs20' not in st.session_state.keys():
+    st.session_state['dfs20'] = rxl.get_feature_domain_20p('KurtosisAcceleration')
 
-# if 'dfs20' not in st.session_state.keys():
-#     st.session_state['dfs20'] = rxl.get_feature_domain_20p('KurtosisAcceleration')
-
-# if 'fds' not in st.session_state.keys():
-#     st.session_state['dfs'] = rxl.get_all_feature_domains()
+if 'fds' not in st.session_state.keys():
+    st.session_state['dfs'] = rxl.get_all_feature_domains()
 
 st.markdown("# Naïve Bayes Classifier Optimization for Bearing Fault Detection")
 st.markdown("""
