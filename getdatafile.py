@@ -7,10 +7,11 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-st.write(os.path.isfile(r'/app/root/.aws/credentials'))
-
 # use lines below to run locally
-os.environ['AWS_SHARED_CREDENTIALS_FILE'] = r'/app/root/.aws/credentials'
+fp = os.path.join(os.getcwd(), '.aws', 'credentials')
+os.path.isfile(fp)
+st.print(fp)
+os.environ['AWS_SHARED_CREDENTIALS_FILE'] = fp
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
 def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, feat, domain):
