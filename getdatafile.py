@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-# use lines below to run locally
-fp = os.path.join(os.getcwd(), '.aws', 'credentials')
-st.write(os.path.isfile(fp))
+fp = os.path.join(os.getcwd(), 'run', 'secrets', 'AWS_CRED')
 st.write(fp)
+st.write(os.path.isfile(fp))
+# use lines below to run locally
 os.environ['AWS_SHARED_CREDENTIALS_FILE'] = fp
 # os.environ['AWS_CONFIG_FILE'] = r'../.aws/bearingDefectLocator/config'
 
