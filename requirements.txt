@@ -4,7 +4,6 @@ plotly
 numpy
 scipy
 boto3
-sqlalchemy
 pyyaml
 tqdm
 ipywidgets
