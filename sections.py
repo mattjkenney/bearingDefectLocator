@@ -31,7 +31,7 @@ def display_s2():
         st.write('#### &emsp;2. Bearing fault detection will minimize catastrophic failure and maintenance costs')
         st.write('#### &emsp;3. Many industries can easily rotate the in-service machines with spares to allow a regular maintenance schedule and bearing change-out.')
         st.write('#### &emsp;4. Some industries require many more resources for maintenance than others, driving up costs.')
-        df_lcoe = pd.read_csv('lcoeData.csv', header=None, names=['Renewable Energy Type', 'Lowest Average Cost', 'Highest Average Cost'])
+        df_lcoe = pd.read_csv(os.path.join('datafiles','lcoeData.csv'), header=None, names=['Renewable Energy Type', 'Lowest Average Cost', 'Highest Average Cost'])
         df_lcoe = df_lcoe.set_index(['Renewable Energy Type'], drop=True)
         if st.checkbox("Show Data Table"):
             st.write(df_lcoe)

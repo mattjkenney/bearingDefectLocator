@@ -19,7 +19,7 @@ def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, fea
 
 def get_dataframe_from_label(label, qty=12):
 
-    with open('vibs.pk', 'rb') as filehandle:
+    with open(os.path.join('datafiles', 'vibs.pk'), 'rb') as filehandle:
         keyDict = pk.load(filehandle)
     keys = keyDict.get(label)
 
@@ -58,11 +58,14 @@ def get_keys_file(bucket_name= 'bearingvibrations'):
             if k in obj.key:
                 keyDict[k].append(obj.key)
 
-    file = open('vibs.pk', 'wb')
+    file = open(os.path.join('datafiles','vibs.pk'), 'wb')
     pk.dump(keyDict, file)
     file.close()
 
     return
 
+def test():
+    return
+
 if __name__ == "__main__":
-    get_engine()
+    test()

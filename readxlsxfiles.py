@@ -1,9 +1,10 @@
 import pandas as pd
 import openpyxl as xl
+import os
 
 def get_exp2_tables_df(FD):
     
-    df: pd.DataFrame = pd.read_excel("results.xlsx", sheet_name=FD, header=0)
+    df: pd.DataFrame = pd.read_excel(os.path.join('datafiles','results.xlsx'), sheet_name=FD, header=0)
     df = df.set_index('Number of Periods')
     df.columns = pd.MultiIndex.from_product([['Number of Bins'], df.columns])
     df = df.round(0)
@@ -13,19 +14,19 @@ def get_exp2_tables_df(FD):
 
 def get_exp2_df():
 
-    df = pd.read_excel("results.xlsx", sheet_name="Sheet1", header=0, usecols=[1,2,3,4])
+    df = pd.read_excel(os.path.join('datafiles','results.xlsx'), sheet_name="Sheet1", header=0, usecols=[1,2,3,4])
 
     return df
 
 def get_boxplot_df():
 
-    df = pd.read_excel("exp1_boxplot.xlsx", sheet_name="vVelTab", header=0)
+    df = pd.read_excel(os.path.join('datafiles','exp1_boxplot.xlsx'), sheet_name="vVelTab", header=0)
     
     return df
 
 def get_feature_domain_20p(feature_domain):
 
-    df: pd.DataFrame = pd.read_excel('featuresLineCharts.xlsx', sheet_name=feature_domain, header=0)
+    df: pd.DataFrame = pd.read_excel(os.path.join('datafiles','featuresLineCharts.xlsx'), sheet_name=feature_domain, header=0)
     #df = df.set_index('category', drop=True)
     df = df.transpose()
     map = {}
@@ -43,7 +44,7 @@ def get_feature_domain_20p(feature_domain):
 def get_all_feature_domains():
 
     # creates dictionary: dom = {sheet name: (feature, domain)}
-    wb = xl.load_workbook('featuresLineCharts.xlsx')
+    wb = xl.load_workbook(os.path.join('datafiles','featuresLineCharts.xlsx'))
     sheets = wb.worksheets
     fds = {}
     for n in sheets[1:]:
@@ -58,14 +59,20 @@ def get_all_feature_domains():
 
 def get_exp1():
 
-    df = pd.read_excel('exp1.xlsx', header=0)
+    df = pd.read_excel(os.path.join('datafiles','exp1.xlsx'), header=0)
     
     return df
 
 def test():
+    from pandas import DataFrame
+    assert type(get_exp2_tables_df('CA')) == type(DataFrame())
+    assert type(get_exp2_df()) == type(DataFrame())
+    assert type(get_boxplot_df()) == type(DataFrame())
+    assert type(get_feature_domain_20p('KurtosisAcceleration')) ==type(DataFrame())
+    assert type(get_all_feature_domains()) == dict
+    assert type(get_exp1()) == type(DataFrame())
 
-    df = get_exp2_tables_df('CA')
-    print(df)
+    print('...test successfull!')
 
 if __name__ == "__main__":
     test()
