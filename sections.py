@@ -59,7 +59,7 @@ def display_s2():
                     for personnel training, however...
                     ### Machine Learning algorithms face these issues:
                     #### &emsp;&emsp;1. Low number of bearing samples''')
-        if st.checkbox("see explanation", value=False, key='p1'):
+        if st.checkbox("see explanation", value=False, key='x1'):
             # Add histogram data
             if 'nx1' not in st.session_state.keys():
                 st.session_state['nx1'] = 100
@@ -114,16 +114,16 @@ def display_s2():
             st.write("#### You'll notice as the number of samples drop, more gaps appear in-between bins.")
             st.write("#### A machine learning tool will think it's not possible for the class to hold characteristic values \
                     within the open regions, therefore misclassifying the bearing.")
-            collapse_button('p1', 'bp1')
+            collapse_button('x1', 'bx1')
         st.write("#### &emsp;&emsp;2. A large number of data entries per bearing.")
-        if st.checkbox("see explanation", value=False, key='p2'):
+        if st.checkbox("see explanation", value=False, key='x2'):
             st.write("#### Each bearing dataset can contain hundreds of thousands of entries, \
                     consuming significant computational resources. \
                     Therefore, data reduction per bearing sample is much needed. ")
             st.image(os.path.join('images', 'bearingToDataset.jpeg'), caption='Bearing image [6]')
-            collapse_button('p2', 'bp2')
+            collapse_button('x2', 'bx2')
         st.write("#### &emsp;&emsp;3. A lack of independent sample data")
-        if st.checkbox("see explanation", value=False, key='p3'):
+        if st.checkbox("see explanation", value=False, key='x3'):
             st.markdown('''
                         #### A single set of vibrational data all comes from one bearing. \
                         Every line of data carries with it not only the characteristics of the class we \
@@ -134,7 +134,7 @@ def display_s2():
                         vibrations. For true independence, each entry should have no effect on any other.
                         ''')
             st.image(os.path.join('images', 'sampleIndependence.jpeg'))
-            collapse_button('p3', 'bp3')
+            collapse_button('x3', 'bx3')
         st.divider()
 
     if st.checkbox('The Naive Bayes Solution'):
