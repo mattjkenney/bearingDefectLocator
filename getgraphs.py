@@ -1,8 +1,6 @@
 import plotly.express as px
-import plotly.figure_factory as ff
 import plotly.graph_objects as go
 import readxlsxfiles as rxl
-from plotly.subplots import make_subplots
 import pandas as pd
 
 def get_discussion_subplots():
