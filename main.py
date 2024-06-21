@@ -4,7 +4,7 @@ import getdatafile as gdata
 import readxlsxfiles as rxl
 
 if '2M_sample_df' not in st.session_state.keys():
-    df2M = gdata.get_dataframe_from_label('healthy', 1)
+    df2M = gdata.get_dataframe_from_label()
     st.session_state['2M_sample_df'] = df2M
 
 if 'dfs20' not in st.session_state.keys():

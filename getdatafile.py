@@ -17,37 +17,19 @@ def get_dataframe_subset_for_sample(master_dataframe: pd.DataFrame, periods, fea
 
     return df
 
-def get_dataframe_from_label(label, qty=12):
+def get_dataframe_from_label():
 
-    with open(os.path.join('datafiles', 'vibs.pk'), 'rb') as filehandle:
-        keyDict = pk.load(filehandle)
-    keys = keyDict.get(label)
-
-    labelDict= {"H": 'healthy', "I": 'inner race', "O": 'outer race', "B": 'ball', "C": "combination"}
-
-    assert len(keys) >= qty # qty value cannot exceed the number of total objects
-
-    client = boto3.client('s3')
-    dfs = []
-    temp_file = 'temp_file.mat'
-    for i in range(qty):
-        objkey = keys[i]
-        with open(temp_file, 'wb') as data:
-            client.download_fileobj('bearingvibrations', objkey, data)
-        data.close()
-        matfile = loadmat(temp_file)
-        dfn = pd.DataFrame()
-        dfn['vibration velocity'] = tuple(np.reshape(matfile.get('Channel_1'), (2000000,)))
-        dfn['shaft speed'] = tuple(np.reshape(matfile.get('Channel_2'), (2000000,)))
-        dfn['label'] = tuple([labelDict.get(objkey[-9]) for i in range(len(dfn['vibration velocity']))])
-        dfn['instance'] = [objkey[-9:-4] for _ in range(len(dfn['vibration velocity']))]
-        columnsOrder=['instance', 'label', 'shaft speed', 'vibration velocity']
-        dfn = dfn.reindex(columns= columnsOrder)
-        dfs.append(dfn)
-    dfm = pd.concat(dfs, ignore_index=True)
-    os.remove(temp_file)
+    filepath = os.path.join("datafiles", "H-A-1.mat")
+    matfile: dict = loadmat(filepath)
+    dfn = pd.DataFrame()
+    dfn['vibration velocity'] = tuple(np.reshape(matfile.get('Channel_1'), (2000000,)))
+    dfn['shaft speed'] = tuple(np.reshape(matfile.get('Channel_2'), (2000000,)))
+    dfn['label'] = tuple('healthy' for i in range(len(dfn['vibration velocity'])))
+    dfn['instance'] = ['H-A-1' for _ in range(len(dfn['vibration velocity']))]
+    columnsOrder=['instance', 'label', 'shaft speed', 'vibration velocity']
+    dfn = dfn.reindex(columns= columnsOrder)
     
-    return dfm
+    return dfn
 
 def get_keys_file(bucket_name= 'bearingvibrations'):
 
