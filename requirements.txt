@@ -4,7 +4,4 @@ plotly
 numpy
 scipy
 boto3
-pyyaml
-tqdm
-ipywidgets
 openpyxl
