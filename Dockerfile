@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
+RUN yum update && yum install -y \
     build-essential \
     curl \
     software-properties-common \
