@@ -2,7 +2,7 @@ import boto3
 import os
 import pickle as pk
 from scipy.io import loadmat
-from original_files.classBearingFeatures2 import BearingFeatures as BF
+from classBearingFeatures2 import BearingFeatures as BF
 import numpy as np
 import pandas as pd
 
