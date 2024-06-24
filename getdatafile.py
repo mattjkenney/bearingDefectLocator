@@ -1,4 +1,3 @@
-import boto3
 import os
 import pickle as pk
 from scipy.io import loadmat
@@ -30,21 +29,6 @@ def get_dataframe_from_label():
     dfn = dfn.reindex(columns= columnsOrder)
     
     return dfn
-
-def get_keys_file(bucket_name= 'bearingvibrations'):
-
-    keyDict = {'healthy': [], 'inner race': [], 'outer race': [], 'ball': [], 'combination': []}
-    s3 = boto3.resource('s3')
-    for obj in s3.Bucket(bucket_name).objects.all():
-        for k in keyDict.keys():
-            if k in obj.key:
-                keyDict[k].append(obj.key)
-
-    file = open(os.path.join('datafiles','vibs.pk'), 'wb')
-    pk.dump(keyDict, file)
-    file.close()
-
-    return
 
 def test():
     return
